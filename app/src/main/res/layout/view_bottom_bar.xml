@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/nav_home"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:contentDescription="@string/menu_home"
+        android:src="@drawable/ic_home"
+        app:tint="@color/bottom_nav_icon" />
+
+    <ImageView
+        android:id="@+id/nav_buy_list"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:contentDescription="@string/menu_buy_list"
+        android:src="@drawable/ic_home"
+        app:tint="@color/bottom_nav_icon" />
+
+    <ImageView
+        android:id="@+id/nav_inventory"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:contentDescription="@string/menu_inventory"
+        android:src="@drawable/ic_home"
+        app:tint="@color/bottom_nav_icon" />
+
+    <ImageView
+        android:id="@+id/nav_account"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:contentDescription="@string/menu_account"
+        android:src="@drawable/ic_home"
+        app:tint="@color/bottom_nav_icon" />
+
+</merge>
