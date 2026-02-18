@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import com.example.itemly.R
 import com.example.itemly.databinding.ActivityMainBinding
 import com.example.itemly.ui.account.AccountFragment
-import com.example.itemly.ui.autorization.AuthFragment
+import com.example.itemly.ui.authorization.AuthFragment
 import com.example.itemly.ui.buy_list.BuyFragment
 import com.example.itemly.ui.home.HomeFragment
 import com.example.itemly.ui.inventory.InventoryFragment
@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openFragment(fragment: Fragment) {
+    fun openFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(binding.containerFragment.id, fragment)
             .commit()
