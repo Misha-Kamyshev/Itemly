@@ -11,6 +11,7 @@ import com.example.itemly.data.model.DataSpanConfig
 import com.example.itemly.databinding.FragmentRegBinding
 import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.utils.buildColoredSpannable
+import com.example.itemly.utils.nextFocus
 
 class RegFragment : Fragment() {
     private var _binding: FragmentRegBinding? = null
@@ -29,18 +30,21 @@ class RegFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonSignUp.setOnClickListener { onClickButtonSingUp() }
-        binding.hrefSignIn.setOnClickListener { onClickSignIn() }
+        binding.hrefSignIn.setOnClickListener {
+            (requireActivity() as MainActivity).openFragment(AuthFragment())
+        }
         binding.errorSignUpTextView.visibility = View.GONE
 
         paintText()
     }
 
     private fun onClickButtonSingUp() {
-        val login: String = binding.editLoginSignUp.text.toString()
+        val username: String = binding.editUsernameSignUp.text.toString()
+        val email: String = binding.editEmailSignUp.text.toString()
         val password: String = binding.editPasswordSignUp.text.toString()
         val passwordSecond: String = binding.editPasswordSecondSignUp.text.toString()
 
-        if (login.isEmpty() || password.isEmpty() || passwordSecond.isEmpty()) {
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty() || passwordSecond.isEmpty()) {
             binding.errorSignUpTextView.text = "Заполните все поля"
             binding.errorSignUpTextView.visibility = View.VISIBLE
             return
@@ -51,9 +55,6 @@ class RegFragment : Fragment() {
         }
     }
 
-    private fun onClickSignIn() {
-        (requireActivity() as MainActivity).openFragment(AuthFragment())
-    }
 
     private fun paintText() {
         val fullText: String = ContextCompat.getString(binding.root.context, R.string.href_sign_in)

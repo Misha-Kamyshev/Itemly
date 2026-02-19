@@ -30,9 +30,18 @@ class MainActivity : AppCompatActivity() {
         setupBottomBar()
         loadingApplication()
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                maxOf(systemBars.bottom, imeInsets.bottom)
+            )
+
             insets
         }
     }
@@ -53,10 +62,10 @@ class MainActivity : AppCompatActivity() {
         val isLogged = prefs.getBoolean("is_logged", false)
 
         if (isLogged) {
-            binding.bottomBar.visibility = View.VISIBLE
+            visibilityBottomBar(true)
             binding.bottomBar.select(Item.HOME)
         } else {
-            binding.bottomBar.visibility = View.GONE
+            visibilityBottomBar(false)
             supportFragmentManager.beginTransaction()
                 .replace(binding.containerFragment.id, AuthFragment())
                 .commit()
@@ -67,5 +76,14 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(binding.containerFragment.id, fragment)
             .commit()
+    }
+
+    fun visibilityBottomBar(visible: Boolean) {
+        if (visible) {
+            binding.bottomBar.visibility = View.VISIBLE
+            binding.bottomBar.select(Item.HOME)
+        }
+        else
+            binding.bottomBar.visibility = View.GONE
     }
 }

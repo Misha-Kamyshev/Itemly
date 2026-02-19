@@ -3,16 +3,18 @@
     <!--  Вход в акаунт  -->
     <string name="description_sign_in">Войдите в аккаунт\nчтобы продолжить</string>
     <string name="href_sign_up">Нет аккаунта?\nЗарегистрируйтесь</string>
+    <string name="login_hint">E-mail или логин</string>
     <string name="button_sign_in">Войти</string>
 
     <!-- Регистрация в акаунт -->
     <string name="description_sign_up">Зарегистрируйтесь \nчтобы продолжить</string>
     <string name="href_sign_in">Есть акаунт?\nВойти</string>
+    <string name="username_hint">Логин</string>
+    <string name="email_hint">Email</string>
     <string name="button_sign_up">Зарегистрироваться</string>
     <string name="password_second_hint">Повторите пароль</string>
 
     <!--  Общее  -->
     <string name="title_auth">Добро\nпожаловать</string>
-    <string name="login_hint">E-mail или логин</string>
     <string name="password_hint">Пароль</string>
 </resources>

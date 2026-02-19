@@ -11,6 +11,7 @@ import com.example.itemly.data.model.DataSpanConfig
 import com.example.itemly.databinding.FragmentAuthBinding
 import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.utils.buildColoredSpannable
+import com.example.itemly.utils.nextFocus
 
 class AuthFragment : Fragment() {
     private var _binding: FragmentAuthBinding? = null
@@ -29,8 +30,13 @@ class AuthFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonSignIn.setOnClickListener { onClickButtonSignIn() }
-        binding.hrefSignUp.setOnClickListener { onClickSingUp() }
+        binding.hrefSignUp.setOnClickListener {
+            (requireActivity() as MainActivity).openFragment(RegFragment())
+        }
+
         binding.errorSignInTextView.visibility = View.GONE
+        binding.editLoginSignIn.nextFocus(binding.editPasswordSignIn)
+        binding.editPasswordSignIn.nextFocus { onClickButtonSignIn() }
 
         paintText()
     }
@@ -42,11 +48,8 @@ class AuthFragment : Fragment() {
         if (login.isEmpty() || password.isEmpty()) {
             binding.errorSignInTextView.text = "Заполните все поля"
             binding.errorSignInTextView.visibility = View.VISIBLE
+            return
         }
-    }
-
-    private fun onClickSingUp() {
-        (requireActivity() as MainActivity).openFragment(RegFragment())
     }
 
     private fun paintText() {
