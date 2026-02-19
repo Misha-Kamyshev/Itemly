@@ -6,12 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.example.itemly.data.api.ApiClient
 import com.example.itemly.R
 import com.example.itemly.data.model.DataSpanConfig
+import com.example.itemly.data.model.authorization.DataRegistrationPush
 import com.example.itemly.databinding.FragmentRegBinding
 import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.utils.buildColoredSpannable
 import com.example.itemly.utils.nextFocus
+import com.example.itemly.utils.saveToken
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import retrofit2.HttpException
+import java.io.IOException
 
 class RegFragment : Fragment() {
     private var _binding: FragmentRegBinding? = null
@@ -35,6 +43,11 @@ class RegFragment : Fragment() {
         }
         binding.errorSignUpTextView.visibility = View.GONE
 
+        binding.editUsernameSignUp.nextFocus(binding.editEmailSignUp)
+        binding.editEmailSignUp.nextFocus(binding.editPasswordSignUp)
+        binding.editPasswordSignUp.nextFocus(binding.editPasswordSecondSignUp)
+        binding.editPasswordSecondSignUp.nextFocus { onClickButtonSingUp() }
+
         paintText()
     }
 
@@ -53,6 +66,7 @@ class RegFragment : Fragment() {
             binding.errorSignUpTextView.visibility = View.VISIBLE
             return
         }
+        request(username, email, password)
     }
 
 
@@ -73,5 +87,31 @@ class RegFragment : Fragment() {
             )
         )
         binding.hrefSignIn.text = spannable
+    }
+
+    private fun request(username: String, email: String, password: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val response = ApiClient.apiService.signUp(
+                    request = DataRegistrationPush(
+                        username = username,
+                        email = email,
+                        password = password
+                    )
+                )
+                saveToken(requireContext(), response)
+
+                (requireActivity() as MainActivity).visibilityBottomBar(true)
+            } catch (e: HttpException) {
+                val errorJson = e.response()?.errorBody()?.string() ?: "{}"
+                val detail = JSONObject(errorJson).getString("detail")
+
+                binding.errorSignUpTextView.text = detail
+                binding.errorSignUpTextView.visibility = View.VISIBLE
+            } catch (e: IOException) {
+                binding.errorSignUpTextView.text = "Ошибка сети, попробуйте позже"
+                binding.errorSignUpTextView.visibility = View.VISIBLE
+            }
+        }
     }
 }

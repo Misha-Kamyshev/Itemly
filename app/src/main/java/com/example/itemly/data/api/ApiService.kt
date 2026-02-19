@@ -6,8 +6,10 @@ import com.example.itemly.data.model.authorization.DataRegistrationPush
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface ApiService {}
 interface ApiService {
     @POST("user/signin")
     suspend fun signIn(@Body request: DataAuthorizationPush): DataAuthorizationPull
+
+    @POST("user/signup")
+    suspend fun signUp(@Body request: DataRegistrationPush): DataAuthorizationPull
 }
