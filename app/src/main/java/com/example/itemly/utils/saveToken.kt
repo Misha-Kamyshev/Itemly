@@ -17,12 +17,3 @@ fun saveToken(context: Context, response: DataAuthorizationPull) {
         putBoolean(PrefKeys.IS_LOGIN, true)
     }
 }
-
-fun logout(context: Context) {
-    context.getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE).edit {
-        putString(PrefKeys.USERNAME, null)
-        putString(PrefKeys.ACCESS_TOKEN, null)
-        putString(PrefKeys.REFRESH_TOKEN, null)
-        putBoolean(PrefKeys.IS_LOGIN, false)
-    }
-}
