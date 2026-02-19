@@ -12,4 +12,7 @@ interface ApiService {
 
     @POST("user/signup")
     suspend fun signUp(@Body request: DataRegistrationPush): DataAuthorizationPull
+
+    @POST("user/update_token")
+    suspend fun updateToken(@Body refreshToken: String): DataAuthorizationPull
 }
