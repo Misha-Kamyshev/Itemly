@@ -7,3 +7,7 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface ApiService {}
+interface ApiService {
+    @POST("user/signin")
+    suspend fun signIn(@Body request: DataAuthorizationPush): DataAuthorizationPull
+}

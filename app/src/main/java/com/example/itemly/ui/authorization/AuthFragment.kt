@@ -1,17 +1,25 @@
 package com.example.itemly.ui.authorization
 
+import retrofit2.HttpException
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.example.itemly.data.api.ApiClient
 import com.example.itemly.R
 import com.example.itemly.data.model.DataSpanConfig
+import com.example.itemly.data.model.authorization.DataAuthorizationPush
 import com.example.itemly.databinding.FragmentAuthBinding
 import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.utils.buildColoredSpannable
 import com.example.itemly.utils.nextFocus
+import com.example.itemly.utils.saveToken
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.io.IOException
 
 class AuthFragment : Fragment() {
     private var _binding: FragmentAuthBinding? = null
@@ -50,6 +58,8 @@ class AuthFragment : Fragment() {
             binding.errorSignInTextView.visibility = View.VISIBLE
             return
         }
+        binding.errorSignInTextView.visibility = View.GONE
+        request(login, password)
     }
 
     private fun paintText() {
@@ -69,5 +79,31 @@ class AuthFragment : Fragment() {
             )
         )
         binding.hrefSignUp.text = spannable
+    }
+
+    private fun request(login: String, password: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val response = ApiClient.apiService.signIn(
+                    request = DataAuthorizationPush(
+                        login = login,
+                        password = password
+                    )
+                )
+                saveToken(requireContext(), response)
+
+                (requireActivity() as MainActivity).visibilityBottomBar(true)
+            } catch (e: HttpException) {
+                val errorJson =
+                    e.response()?.errorBody()?.string() ?: "{'detail': 'Ошибка сервера'}"
+                val detail = JSONObject(errorJson).getString("detail")
+
+                binding.errorSignInTextView.text = detail
+                binding.errorSignInTextView.visibility = View.VISIBLE
+            } catch (e: IOException) {
+                binding.errorSignInTextView.text = "Ошибка сети, попробуйте позже"
+                binding.errorSignInTextView.visibility = View.VISIBLE
+            }
+        }
     }
 }
