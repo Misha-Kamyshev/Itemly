@@ -103,7 +103,8 @@ class RegFragment : Fragment() {
 
                 (requireActivity() as MainActivity).visibilityBottomBar(true)
             } catch (e: HttpException) {
-                val errorJson = e.response()?.errorBody()?.string() ?: "{}"
+                val errorJson = e.response()?.errorBody()?.string()
+                    ?: "{\"detail\": \"Ошибка сервера\"}"
                 val detail = JSONObject(errorJson).getString("detail")
 
                 binding.errorSignUpTextView.text = detail
