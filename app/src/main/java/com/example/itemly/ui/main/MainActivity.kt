@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import com.example.itemly.R
+import com.example.itemly.data.PrefKeys
 import com.example.itemly.databinding.ActivityMainBinding
 import com.example.itemly.ui.account.AccountFragment
 import com.example.itemly.ui.authorization.AuthFragment
@@ -58,8 +58,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadingApplication() {
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        val isLogged = prefs.getBoolean("is_logged", false)
+        val prefs = getSharedPreferences(PrefKeys.PREF_USER, MODE_PRIVATE)
+        val isLogged = prefs.getBoolean(PrefKeys.IS_LOGIN, false)
 
         if (isLogged) {
             visibilityBottomBar(true)
