@@ -12,11 +12,12 @@ class BottomBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : LinearLayout(context, attrs) {
-    enum class Item { HOME, BUY, INVENTORY, ACCOUNT }
+    enum class Item { HOME, FAVORITE, ADD, MY_IMAGE, ACCOUNT }
 
     private val navHome: ImageView
-    private val navBuyList: ImageView
-    private val navInventory: ImageView
+    private val navFavorite: ImageView
+    private val navAdd: ImageView
+    private val navMyImage: ImageView
     private val navAccount: ImageView
     lateinit var onClickListener: (Item) -> Unit
     private var currentItem: Item = Item.HOME
@@ -26,13 +27,15 @@ class BottomBarView @JvmOverloads constructor(
         inflate(context, R.layout.view_bottom_bar, this)
 
         navHome = findViewById(R.id.nav_home)
-        navBuyList = findViewById(R.id.nav_buy_list)
-        navInventory = findViewById(R.id.nav_inventory)
+        navFavorite = findViewById(R.id.nav_favorite)
+        navAdd = findViewById(R.id.nav_add)
+        navMyImage = findViewById(R.id.nav_my_image)
         navAccount = findViewById(R.id.nav_account)
 
         navHome.setOnClickListener { select(Item.HOME) }
-        navBuyList.setOnClickListener { select(Item.BUY) }
-        navInventory.setOnClickListener { select(Item.INVENTORY) }
+        navFavorite.setOnClickListener { select(Item.FAVORITE) }
+        navAdd.setOnClickListener { select(Item.ADD) }
+        navMyImage.setOnClickListener { select(Item.MY_IMAGE) }
         navAccount.setOnClickListener { select(Item.ACCOUNT) }
     }
 
@@ -42,13 +45,15 @@ class BottomBarView @JvmOverloads constructor(
         currentItem = item
 
         navHome.isSelected = item == Item.HOME
-        navBuyList.isSelected = item == Item.BUY
-        navInventory.isSelected = item == Item.INVENTORY
+        navFavorite.isSelected = item == Item.FAVORITE
+        navAdd.isSelected = item == Item.ADD
+        navMyImage.isSelected = item == Item.MY_IMAGE
         navAccount.isSelected = item == Item.ACCOUNT
 
         animateItem(navHome, item == Item.HOME)
-        animateItem(navBuyList, item == Item.BUY)
-        animateItem(navInventory, item == Item.INVENTORY)
+        animateItem(navFavorite, item == Item.FAVORITE)
+        animateItem(navAdd, item == Item.ADD)
+        animateItem(navMyImage, item == Item.MY_IMAGE)
         animateItem(navAccount, item == Item.ACCOUNT)
     }
 

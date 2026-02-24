@@ -2,8 +2,9 @@
 <resources>
     <!--  Bottom Bar  -->
     <string name="menu_home">Главная</string>
-    <string name="menu_buy_list">Покупки</string>
-    <string name="menu_inventory">Хранилище</string>
+    <string name="menu_favorite">Избранное</string>
+    <string name="menu_add">Добавить</string>
+    <string name="menu_my_image">Мои фото</string>
     <string name="menu_account">Акаунт</string>
 
     <!--    -->

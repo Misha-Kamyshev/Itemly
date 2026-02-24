@@ -13,23 +13,33 @@
         app:tint="@color/bottom_nav_icon" />
 
     <ImageView
-        android:id="@+id/nav_buy_list"
+        android:id="@+id/nav_favorite"
         android:layout_width="0dp"
         android:layout_height="20dp"
         android:layout_gravity="center"
         android:layout_weight="1"
-        android:contentDescription="@string/menu_buy_list"
-        android:src="@drawable/ic_home"
+        android:contentDescription="@string/menu_favorite"
+        android:src="@drawable/ic_favorite"
         app:tint="@color/bottom_nav_icon" />
 
     <ImageView
-        android:id="@+id/nav_inventory"
+        android:id="@+id/nav_add"
         android:layout_width="0dp"
         android:layout_height="20dp"
         android:layout_gravity="center"
         android:layout_weight="1"
-        android:contentDescription="@string/menu_inventory"
-        android:src="@drawable/ic_home"
+        android:contentDescription="@string/menu_add"
+        android:src="@drawable/ic_plus"
+        app:tint="@color/bottom_nav_icon" />
+
+    <ImageView
+        android:id="@+id/nav_my_image"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:contentDescription="@string/menu_my_image"
+        android:src="@drawable/ic_image"
         app:tint="@color/bottom_nav_icon" />
 
     <ImageView
@@ -39,7 +49,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:contentDescription="@string/menu_account"
-        android:src="@drawable/ic_home"
+        android:src="@drawable/ic_account"
         app:tint="@color/bottom_nav_icon" />
 
 </merge>
