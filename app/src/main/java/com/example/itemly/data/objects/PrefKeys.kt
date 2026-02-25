@@ -1,4 +1,4 @@
-package com.example.itemly.data
+package com.example.itemly.data.objects
 
 object PrefKeys {
     const val PREF_USER = "user"

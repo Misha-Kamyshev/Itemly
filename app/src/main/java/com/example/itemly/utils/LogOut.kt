@@ -2,7 +2,7 @@ package com.example.itemly.utils
 
 import android.content.Context
 import androidx.core.content.edit
-import com.example.itemly.data.PrefKeys
+import com.example.itemly.data.objects.PrefKeys
 
 
 fun logout(context: Context) {

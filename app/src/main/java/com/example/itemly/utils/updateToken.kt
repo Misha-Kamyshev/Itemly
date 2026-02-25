@@ -2,9 +2,9 @@ package com.example.itemly.utils
 
 import android.content.Context
 import android.widget.Toast
-import com.example.itemly.data.PrefKeys
+import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.data.api.ApiClient
-import com.example.itemly.data.model.CodeToken
+import com.example.itemly.data.objects.CodeToken
 import retrofit2.HttpException
 import java.io.IOException
 

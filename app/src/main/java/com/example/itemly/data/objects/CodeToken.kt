@@ -1,4 +1,4 @@
-package com.example.itemly.data.model
+package com.example.itemly.data.objects
 
 object CodeToken {
     const val SUCCESSFUL = 200
