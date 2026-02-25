@@ -7,5 +7,11 @@
     <string name="menu_my_image">Мои фото</string>
     <string name="menu_account">Акаунт</string>
 
-    <!--    -->
+    <!--  HomeFragment  -->
+    <string name="home_items">Изображение</string>
+
+    <!--  AddFragment  -->
+    <string name="add_close">Иконка закрыть</string>
+    <string name="add_photo">Иконка изображения</string>
+    <string name="add_collage">Иконка коллажа</string>
 </resources>
