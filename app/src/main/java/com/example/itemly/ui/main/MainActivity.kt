@@ -9,11 +9,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.itemly.data.PrefKeys
 import com.example.itemly.databinding.ActivityMainBinding
+import com.example.itemly.ui.AddFragment
+import com.example.itemly.ui.FavoriteFragment
+import com.example.itemly.ui.MyImageFragment
 import com.example.itemly.ui.account.AccountFragment
 import com.example.itemly.ui.authorization.AuthFragment
-import com.example.itemly.ui.buy_list.BuyFragment
 import com.example.itemly.ui.home.HomeFragment
-import com.example.itemly.ui.inventory.InventoryFragment
 import com.example.itemly.ui.main.components.BottomBarView.Item
 
 class MainActivity : AppCompatActivity() {
@@ -50,8 +51,9 @@ class MainActivity : AppCompatActivity() {
         binding.bottomBar.onClickListener = { item ->
             when (item) {
                 Item.HOME -> openFragment(HomeFragment())
-                Item.BUY -> openFragment(BuyFragment())
-                Item.INVENTORY -> openFragment(InventoryFragment())
+                Item.FAVORITE -> openFragment(FavoriteFragment())
+                Item.ADD -> openAddFragment()
+                Item.MY_IMAGE -> openFragment(MyImageFragment())
                 Item.ACCOUNT -> openFragment(AccountFragment())
             }
         }
@@ -78,12 +80,24 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
+    private fun openAddFragment() {
+        supportFragmentManager.beginTransaction()
+            .add(binding.containerFragment.id, AddFragment(), "ADD_FRAGMENT")
+            .commit()
+    }
+
+    fun closeAddFragment() {
+        supportFragmentManager.beginTransaction()
+            .remove(supportFragmentManager.findFragmentByTag("ADD_FRAGMENT")!!)
+            .commit()
+        binding.bottomBar.restorePrevious()
+    }
+
     fun visibilityBottomBar(visible: Boolean) {
         if (visible) {
             binding.bottomBar.visibility = View.VISIBLE
             binding.bottomBar.select(Item.HOME)
-        }
-        else
+        } else
             binding.bottomBar.visibility = View.GONE
     }
 }

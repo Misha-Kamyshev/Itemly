@@ -20,7 +20,8 @@ class BottomBarView @JvmOverloads constructor(
     private val navMyImage: ImageView
     private val navAccount: ImageView
     lateinit var onClickListener: (Item) -> Unit
-    private var currentItem: Item = Item.HOME
+    var currentItem: Item = Item.HOME
+    var lastCurrentItem: Item? = null
 
     init {
         orientation = HORIZONTAL
@@ -40,8 +41,11 @@ class BottomBarView @JvmOverloads constructor(
     }
 
     fun select(item: Item) {
+        if (item == currentItem && item == Item.ADD) return
+
         onClickListener.invoke(item)
 
+        lastCurrentItem = currentItem
         currentItem = item
 
         navHome.isSelected = item == Item.HOME
@@ -64,5 +68,23 @@ class BottomBarView @JvmOverloads constructor(
             .setDuration(180)
             .setInterpolator(DecelerateInterpolator())
             .start()
+    }
+
+    fun restorePrevious() {
+        lastCurrentItem!!.let {
+            currentItem = it
+
+            navHome.isSelected = it == Item.HOME
+            navFavorite.isSelected = it == Item.FAVORITE
+            navAdd.isSelected = false
+            navMyImage.isSelected = it == Item.MY_IMAGE
+            navAccount.isSelected = it == Item.ACCOUNT
+
+            animateItem(navHome, it == Item.HOME)
+            animateItem(navFavorite, it == Item.FAVORITE)
+            animateItem(navAdd, false)
+            animateItem(navMyImage, it == Item.MY_IMAGE)
+            animateItem(navAccount, it == Item.ACCOUNT)
+        }
     }
 }
