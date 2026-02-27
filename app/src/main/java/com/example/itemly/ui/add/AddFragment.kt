@@ -1,10 +1,9 @@
-package com.example.itemly.ui
+package com.example.itemly.ui.add
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.example.itemly.databinding.FragmentAddBinding
 import com.example.itemly.ui.main.MainActivity
@@ -25,6 +24,6 @@ class AddFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.closeFragmentAdd.setOnClickListener { (activity as? MainActivity)?.closeAddFragment() }
+        binding.backgroundFragmentAdd.setOnClickListener { (activity as? MainActivity)?.closeAddFragment() }
     }
 }

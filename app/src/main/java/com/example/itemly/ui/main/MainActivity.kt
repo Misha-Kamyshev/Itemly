@@ -9,7 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.ActivityMainBinding
-import com.example.itemly.ui.AddFragment
+import com.example.itemly.ui.add.AddFragment
 import com.example.itemly.ui.FavoriteFragment
 import com.example.itemly.ui.MyImageFragment
 import com.example.itemly.ui.account.AccountFragment
