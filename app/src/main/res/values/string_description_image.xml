@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--  icons  -->
+    <string name="ic_like">Иконка лайка</string>
+    <string name="ic_comment">Иконка комментариев</string>
+
     <!--  Bottom Bar  -->
     <string name="menu_home">Главная</string>
     <string name="menu_favorite">Избранное</string>
@@ -14,4 +18,7 @@
     <string name="add_close">Иконка закрыть</string>
     <string name="add_photo">Иконка изображения</string>
     <string name="add_collage">Иконка коллажа</string>
+
+    <!--  DetailFragment  -->
+    <string name="detail_user_image">Фото профиля автора</string>
 </resources>

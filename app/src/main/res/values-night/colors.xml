@@ -4,4 +4,6 @@
     <color name="white">@android:color/black</color>
 
     <color name="gray">#A2A2A2</color>
+
+    <color name="black_transparent">@color/white_transparent</color>
 </resources>
