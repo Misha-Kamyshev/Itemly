@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.itemly.databinding.FragmentAddBinding
+import com.example.itemly.ui.addPhoto.AddPhotoFragment
 import com.example.itemly.ui.main.MainActivity
 
 class AddFragment : Fragment() {
