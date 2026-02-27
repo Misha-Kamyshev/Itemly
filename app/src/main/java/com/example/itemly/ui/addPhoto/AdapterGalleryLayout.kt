@@ -1,10 +1,12 @@
 package com.example.itemly.ui.addPhoto
 
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.itemly.R
@@ -13,12 +15,15 @@ import com.google.android.material.card.MaterialCardView
 
 class AdapterGalleryLayout(
     private val dataGallery: List<DataPhoto>,
+    private val onClickCamera: () -> Unit,
     private val onClickImage: (Uri?) -> Unit
 ) : RecyclerView.Adapter<AdapterGalleryLayout.ViewHolder>() {
     private var selectedPosition: Int = RecyclerView.NO_POSITION
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView = view.findViewById(R.id.imageGalleryPhoto)
         val selectLayout: MaterialCardView = view.findViewById(R.id.selectedLayoutGalleryPhoto)
+        val camera: ImageView = view.findViewById(R.id.imageCamera)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -29,18 +34,35 @@ class AdapterGalleryLayout(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val photo = dataGallery[position]
+        holder.selectLayout.visibility = View.GONE
+        holder.camera.visibility = View.GONE
+        holder.image.setImageDrawable(null)
+        holder.itemView.background = null
+
+        if (position == 0) {
+            holder.itemView.background = ColorDrawable(
+                ContextCompat.getColor(holder.itemView.context, android.R.color.black)
+            )
+            holder.camera.visibility = View.VISIBLE
+
+            holder.itemView.setOnClickListener { onClickCamera() }
+            return
+        }
+
+        val photo = dataGallery[position - 1]
 
         Glide.with(holder.itemView)
             .load(photo.uri)
             .centerCrop()
             .into(holder.image)
 
-        holder.selectLayout.visibility = if (position == selectedPosition) View.VISIBLE else View.GONE
+        holder.selectLayout.visibility =
+            if (position == selectedPosition) View.VISIBLE else View.GONE
 
         holder.image.setOnClickListener {
             val previousPosition = selectedPosition
-            selectedPosition = if (position == selectedPosition) RecyclerView.NO_POSITION else position
+            selectedPosition =
+                if (position == selectedPosition) RecyclerView.NO_POSITION else position
 
             if (previousPosition != RecyclerView.NO_POSITION) {
                 notifyItemChanged(previousPosition)
@@ -52,5 +74,5 @@ class AdapterGalleryLayout(
         }
     }
 
-    override fun getItemCount(): Int = dataGallery.size
+    override fun getItemCount(): Int = dataGallery.size + 1
 }
