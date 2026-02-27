@@ -26,5 +26,14 @@ class AddFragment : Fragment() {
 
         binding.backgroundFragmentAdd.setOnClickListener { (activity as? MainActivity)?.closeAddFragment() }
         binding.closeFragmentAdd.setOnClickListener { (activity as? MainActivity)?.closeAddFragment() }
+        binding.backgroundFragmentAdd.setOnClickListener {
+            (activity as? MainActivity)?.closeAddFragment()
+        }
+        binding.closeFragmentAdd.setOnClickListener {
+            (activity as? MainActivity)?.closeAddFragment()
+        }
+        binding.buttonAddPhotoFragmentAdd.setOnClickListener {
+            (activity as? MainActivity)?.openFragment(AddPhotoFragment())
+        }
     }
 }
