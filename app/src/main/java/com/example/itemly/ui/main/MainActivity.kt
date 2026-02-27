@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .add(binding.containerFragment.id, AddFragment(), "ADD_FRAGMENT")
             .commit()
+        binding.bottomBar.visibility = View.GONE
     }
 
     fun closeAddFragment() {
@@ -91,6 +92,7 @@ class MainActivity : AppCompatActivity() {
             .remove(supportFragmentManager.findFragmentByTag("ADD_FRAGMENT")!!)
             .commit()
         binding.bottomBar.restorePrevious()
+        binding.bottomBar.visibility = View.VISIBLE
     }
 
     fun visibilityBottomBar(visible: Boolean) {
