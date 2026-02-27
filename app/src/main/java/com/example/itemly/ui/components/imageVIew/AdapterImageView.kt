@@ -1,4 +1,4 @@
-package com.example.itemly.ui.home
+package com.example.itemly.ui.components.imageVIew
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,15 +8,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.itemly.R
 import com.example.itemly.data.model.home.HomeData
 
-class AdapterHomeFragment(private val data: List<HomeData>) :
-    RecyclerView.Adapter<AdapterHomeFragment.ViewHolder>() {
+class AdapterImageView(
+    private val data: List<HomeData>,
+    private val onClickItem: (item: HomeData) -> Unit
+) :
+    RecyclerView.Adapter<AdapterImageView.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val image: ImageView = view.findViewById(R.id.imageViewItemFragmentHome)
+        val image: ImageView = view.findViewById(R.id.imageViewItem)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.item_fragment_home, parent, false)
+        val view = inflater.inflate(R.layout.item_image_view, parent, false)
 
         return ViewHolder(view)
     }
@@ -25,6 +28,7 @@ class AdapterHomeFragment(private val data: List<HomeData>) :
         val item = data[position]
 
         holder.image.setImageResource(item.imageUrl)
+        holder.itemView.setOnClickListener { onClickItem(item) }
     }
 
     override fun getItemCount(): Int = data.size
