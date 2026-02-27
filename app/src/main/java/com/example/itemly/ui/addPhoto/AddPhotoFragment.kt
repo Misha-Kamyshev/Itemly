@@ -37,7 +37,7 @@ class AddPhotoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.recyclerLayoutAddPhotoFragment.visibility = View.GONE
+        binding.galleryLayoutAddPhotoFragment.visibility = View.GONE
         binding.noAccessLayoutAddPhotoFragment.visibility = View.GONE
 
         checkGalleryPermission()
@@ -66,8 +66,9 @@ class AddPhotoFragment : Fragment() {
     }
 
     private fun showGalleryLayout() {
-        binding.recyclerLayoutAddPhotoFragment.visibility = View.VISIBLE
+        binding.galleryLayoutAddPhotoFragment.visibility = View.VISIBLE
         binding.noAccessLayoutAddPhotoFragment.visibility = View.GONE
+
         binding.root.setBackgroundColor(
             ContextCompat.getColor(
                 requireContext(),
@@ -77,7 +78,7 @@ class AddPhotoFragment : Fragment() {
     }
 
     private fun showNoAccessLayout() {
-        binding.recyclerLayoutAddPhotoFragment.visibility = View.GONE
+        binding.galleryLayoutAddPhotoFragment.visibility = View.GONE
         binding.noAccessLayoutAddPhotoFragment.visibility = View.VISIBLE
         binding.root.setBackgroundColor(
             ContextCompat.getColor(
