@@ -1,10 +1,12 @@
 package com.example.itemly.ui.addPhoto
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +24,7 @@ class AddPhotoFragment : Fragment() {
     private var _binding: FragmentAddPhotoBinding? = null
     private val binding get() = _binding!!
     private var selectedImage: Uri? = null
+    private lateinit var cameraPhotoUri: Uri
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -88,14 +91,19 @@ class AddPhotoFragment : Fragment() {
         val spacing = resources.getDimensionPixelSize(R.dimen.spacing_image_gallery)
 
         binding.recyclerLayoutAddPhotoFragment.apply {
-            adapter = AdapterGalleryLayout(loadImages(requireContext()))
-            { item ->
-                if (item != null) {
-                    binding.acceptSelectedFragmentAddPhoto.visibility = View.VISIBLE
-                    this@AddPhotoFragment.selectedImage = item
-                } else
-                    binding.acceptSelectedFragmentAddPhoto.visibility = View.GONE
-            }
+            adapter = AdapterGalleryLayout(
+                loadImages(requireContext()),
+                onClickCamera = {
+                    cameraPhotoUri = createImageUri()
+                    takePictureLauncher.launch(cameraPhotoUri)
+                },
+                onClickImage = { item ->
+                    if (item != null) {
+                        binding.acceptSelectedFragmentAddPhoto.visibility = View.VISIBLE
+                        this@AddPhotoFragment.selectedImage = item
+                    } else
+                        binding.acceptSelectedFragmentAddPhoto.visibility = View.GONE
+                })
 
             layoutManager = GridLayoutManager(
                 requireContext(),
@@ -122,5 +130,26 @@ class AddPhotoFragment : Fragment() {
                 R.color.bg_no_access_layout
             )
         )
+    }
+
+    private val takePictureLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            selectedImage = cameraPhotoUri
+            binding.acceptSelectedFragmentAddPhoto.visibility = View.VISIBLE
+        }
+    }
+
+    private fun createImageUri(): Uri {
+        val filename = "IMG_${System.currentTimeMillis()}.jpg"
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        }
+        return requireContext().contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )!!
     }
 }
