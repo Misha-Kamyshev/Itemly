@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.itemly.R
 import com.example.itemly.databinding.FragmentAddPhotoBinding
 
 class AddPhotoFragment : Fragment() {
@@ -35,8 +36,8 @@ class AddPhotoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.galleryLayout.visibility = View.GONE
-        binding.noAccessLayout.visibility = View.GONE
+        binding.recyclerLayoutAddPhotoFragment.visibility = View.GONE
+        binding.noAccessLayoutAddPhotoFragment.visibility = View.GONE
 
         checkGalleryPermission()
     }
@@ -54,12 +55,24 @@ class AddPhotoFragment : Fragment() {
     }
 
     private fun showGalleryLayout() {
-        binding.galleryLayout.visibility = View.VISIBLE
-        binding.noAccessLayout.visibility = View.GONE
+        binding.recyclerLayoutAddPhotoFragment.visibility = View.VISIBLE
+        binding.noAccessLayoutAddPhotoFragment.visibility = View.GONE
+        binding.root.setBackgroundColor(
+            ContextCompat.getColor(
+                requireContext(),
+                android.R.color.white
+            )
+        )
     }
 
     private fun showNoAccessLayout() {
-        binding.galleryLayout.visibility = View.GONE
-        binding.noAccessLayout.visibility = View.VISIBLE
+        binding.recyclerLayoutAddPhotoFragment.visibility = View.GONE
+        binding.noAccessLayoutAddPhotoFragment.visibility = View.VISIBLE
+        binding.root.setBackgroundColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.bg_no_access_layout
+            )
+        )
     }
 }

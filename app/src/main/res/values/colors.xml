@@ -13,4 +13,7 @@
     <color name="gray_container_add_button_select">#989597</color>
     <color name="gray_text_add_button_select">#434343</color>
     <color name="gray_background_add">#66000000</color>
+
+    <!-- FragmentAddPhoto  -->
+    <color name="bg_no_access_layout">#2F2F2F</color>
 </resources>
