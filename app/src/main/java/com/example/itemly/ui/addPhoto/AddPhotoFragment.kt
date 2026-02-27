@@ -2,6 +2,7 @@ package com.example.itemly.ui.addPhoto
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,12 +14,14 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.itemly.R
 import com.example.itemly.databinding.FragmentAddPhotoBinding
+import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.utils.GridSpacingItemDecoration
 import com.example.itemly.utils.loadImages
 
 class AddPhotoFragment : Fragment() {
     private var _binding: FragmentAddPhotoBinding? = null
     private val binding get() = _binding!!
+    private var selectedImage: Uri? = null
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -44,6 +47,9 @@ class AddPhotoFragment : Fragment() {
         binding.noAccessLayoutAddPhotoFragment.visibility = View.GONE
 
         checkGalleryPermission()
+        binding.acceptSelectedFragmentAddPhoto.setOnClickListener {
+//            (activity as? MainActivity)?.openFragment(PublishPhoto(selectedImage!!))
+        }
     }
 
     private fun getReadPermission(): String {
@@ -83,6 +89,14 @@ class AddPhotoFragment : Fragment() {
 
         binding.recyclerLayoutAddPhotoFragment.apply {
             adapter = AdapterGalleryLayout(loadImages(requireContext()))
+            { item ->
+                if (item != null) {
+                    binding.acceptSelectedFragmentAddPhoto.visibility = View.VISIBLE
+                    this@AddPhotoFragment.selectedImage = item
+                } else
+                    binding.acceptSelectedFragmentAddPhoto.visibility = View.GONE
+            }
+
             layoutManager = GridLayoutManager(
                 requireContext(),
                 3,

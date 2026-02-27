@@ -3,6 +3,8 @@
     <!--  icons  -->
     <string name="ic_like">Иконка лайка</string>
     <string name="ic_comment">Иконка комментариев</string>
+    <string name="ic_ok">Иконка галочки</string>
+    <string name="ic_back">Иконка назад</string>
 
     <!--  Bottom Bar  -->
     <string name="menu_home">Главная</string>
@@ -21,4 +23,7 @@
 
     <!--  DetailFragment  -->
     <string name="detail_user_image">Фото профиля автора</string>
+
+    <!--  ItemGalleryPhoto  -->
+    <string name="photo_from_gallery">Фото из галери</string>
 </resources>

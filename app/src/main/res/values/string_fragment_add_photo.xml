@@ -3,4 +3,6 @@
     <string name="title_no_access_layout">Предоставьте доступ, чтобы продолжить</string>
     <string name="description_no_access_layout">Для публикации изображений приложению Itemly требуется разрешение на доступ к галерее, чтобы загружать фото с этого устройства</string>
     <string name="button_no_access_layout">Предоставить доступ</string>
+
+    <string name="title_top_bar">Выберите изображение</string>
 </resources>
