@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.recyclerview)
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
 
     // Тестирование
     testImplementation(libs.junit)
