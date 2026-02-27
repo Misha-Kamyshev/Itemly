@@ -2,6 +2,7 @@ package com.example.itemly.ui.addPhoto
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -42,15 +43,25 @@ class AddPhotoFragment : Fragment() {
         checkGalleryPermission()
     }
 
+    private fun getReadPermission(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+    }
+
     private fun checkGalleryPermission() {
+        val permission = getReadPermission()
+
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
+                permission
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             showGalleryLayout()
         } else {
-            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            requestPermissionLauncher.launch(permission)
         }
     }
 
