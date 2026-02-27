@@ -10,8 +10,11 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.itemly.R
 import com.example.itemly.databinding.FragmentAddPhotoBinding
+import com.example.itemly.utils.GridSpacingItemDecoration
+import com.example.itemly.utils.loadImages
 
 class AddPhotoFragment : Fragment() {
     private var _binding: FragmentAddPhotoBinding? = null
@@ -75,6 +78,25 @@ class AddPhotoFragment : Fragment() {
                 android.R.color.white
             )
         )
+
+        val spacing = resources.getDimensionPixelSize(R.dimen.spacing_image_gallery)
+
+        binding.recyclerLayoutAddPhotoFragment.apply {
+            adapter = AdapterGalleryLayout(loadImages(requireContext()))
+            layoutManager = GridLayoutManager(
+                requireContext(),
+                3,
+                GridLayoutManager.VERTICAL,
+                false
+            )
+            addItemDecoration(
+                GridSpacingItemDecoration(
+                    3,
+                    spacing,
+                    true
+                )
+            )
+        }
     }
 
     private fun showNoAccessLayout() {
