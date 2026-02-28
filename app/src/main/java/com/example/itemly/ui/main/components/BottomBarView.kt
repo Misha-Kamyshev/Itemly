@@ -33,17 +33,15 @@ class BottomBarView @JvmOverloads constructor(
         navMyImage = findViewById(R.id.nav_my_image)
         navAccount = findViewById(R.id.nav_account)
 
-        navHome.setOnClickListener { select(Item.HOME) }
-        navFavorite.setOnClickListener { select(Item.FAVORITE) }
-        navAdd.setOnClickListener { select(Item.ADD) }
-        navMyImage.setOnClickListener { select(Item.MY_IMAGE) }
-        navAccount.setOnClickListener { select(Item.ACCOUNT) }
+        navHome.setOnClickListener { select(Item.HOME); onClickListener.invoke(Item.HOME) }
+        navFavorite.setOnClickListener { select(Item.FAVORITE); onClickListener.invoke(Item.FAVORITE) }
+        navAdd.setOnClickListener { select(Item.ADD); onClickListener.invoke(Item.ADD) }
+        navMyImage.setOnClickListener { select(Item.MY_IMAGE); onClickListener.invoke(Item.MY_IMAGE) }
+        navAccount.setOnClickListener { select(Item.ACCOUNT); onClickListener.invoke(Item.ACCOUNT) }
     }
 
     fun select(item: Item) {
         if (item == currentItem && item == Item.ADD) return
-
-        onClickListener.invoke(item)
 
         lastCurrentItem = currentItem
         currentItem = item

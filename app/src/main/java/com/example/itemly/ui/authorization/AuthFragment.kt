@@ -39,7 +39,7 @@ class AuthFragment : Fragment() {
 
         binding.buttonSignIn.setOnClickListener { onClickButtonSignIn() }
         binding.hrefSignUp.setOnClickListener {
-            (requireActivity() as MainActivity).openFragment(RegFragment())
+            (requireActivity() as MainActivity).openMainFragment("REGISTRATION", RegFragment())
         }
 
         binding.errorSignInTextView.visibility = View.GONE
@@ -92,7 +92,7 @@ class AuthFragment : Fragment() {
                 )
                 saveToken(requireContext(), response)
 
-                (requireActivity() as MainActivity).visibilityBottomBar(true)
+                (requireActivity() as MainActivity).onLoginSuccess()
             } catch (e: HttpException) {
                 val errorJson = e.response()?.errorBody()?.string()
                     ?: "{\"detail\": \"Ошибка сервера\"}"

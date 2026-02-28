@@ -57,7 +57,7 @@ class AddPhotoFragment : Fragment() {
                     putString("photo_uri", selectedImage.toString())
                 }
             }
-            (activity as? MainActivity)?.openFragment(fragment)
+            (activity as? MainActivity)?.openDetailFragment(fragment)
         }
     }
 
@@ -147,7 +147,7 @@ class AddPhotoFragment : Fragment() {
                     putString("photo_uri", cameraPhotoUri.toString())
                 }
             }
-            (activity as? MainActivity)?.openFragment(fragment)
+            (activity as? MainActivity)?.openDetailFragment(fragment)
         }
     }
 

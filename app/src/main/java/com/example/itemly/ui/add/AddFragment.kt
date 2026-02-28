@@ -32,7 +32,8 @@ class AddFragment : Fragment() {
             (activity as? MainActivity)?.closeAddFragment()
         }
         binding.buttonAddPhotoFragmentAdd.setOnClickListener {
-            (activity as? MainActivity)?.openFragment(AddPhotoFragment())
+            (activity as? MainActivity)?.openDetailFragment(AddPhotoFragment())
         }
+//        binding.buttonAddCollageFragmentAdd.setOnClickListener { }
     }
 }

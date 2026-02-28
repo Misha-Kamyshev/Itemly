@@ -37,7 +37,7 @@ class HomeFragment : Fragment() {
             )
             { item ->
                 if (!binding.editSearch.hasFocus())
-                    (activity as? MainActivity)?.openFragment(DetailImageFragment(item))
+                    (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(item))
             }
 
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
