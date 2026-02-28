@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.itemly.R
 import com.example.itemly.databinding.FragmentAddPhotoBinding
 import com.example.itemly.ui.main.MainActivity
+import com.example.itemly.ui.previewImage.PreviewImageFragment
 import com.example.itemly.utils.GridSpacingItemDecoration
 import com.example.itemly.utils.loadImages
 
@@ -51,7 +52,12 @@ class AddPhotoFragment : Fragment() {
 
         checkGalleryPermission()
         binding.acceptSelectedFragmentAddPhoto.setOnClickListener {
-//            (activity as? MainActivity)?.openFragment(PublishPhoto(selectedImage!!))
+            val fragment = PreviewImageFragment().apply {
+                arguments = Bundle().apply {
+                    putString("photo_uri", selectedImage.toString())
+                }
+            }
+            (activity as? MainActivity)?.openFragment(fragment)
         }
     }
 
@@ -136,8 +142,12 @@ class AddPhotoFragment : Fragment() {
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            selectedImage = cameraPhotoUri
-            binding.acceptSelectedFragmentAddPhoto.visibility = View.VISIBLE
+            val fragment = PreviewImageFragment().apply {
+                arguments = Bundle().apply {
+                    putString("photo_uri", cameraPhotoUri.toString())
+                }
+            }
+            (activity as? MainActivity)?.openFragment(fragment)
         }
     }
 

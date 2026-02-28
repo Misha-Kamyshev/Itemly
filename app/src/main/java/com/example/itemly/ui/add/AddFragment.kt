@@ -25,8 +25,6 @@ class AddFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.backgroundFragmentAdd.setOnClickListener { (activity as? MainActivity)?.closeAddFragment() }
-        binding.closeFragmentAdd.setOnClickListener { (activity as? MainActivity)?.closeAddFragment() }
         binding.backgroundFragmentAdd.setOnClickListener {
             (activity as? MainActivity)?.closeAddFragment()
         }
