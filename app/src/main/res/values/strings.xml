@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Itemly</string>
+
+    <string name="push_photo">Отправка фото...</string>
 </resources>

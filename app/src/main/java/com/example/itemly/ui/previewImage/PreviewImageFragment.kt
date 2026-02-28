@@ -28,6 +28,7 @@ import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import retrofit2.HttpException
@@ -57,9 +58,13 @@ class PreviewImageFragment : Fragment() {
         binding.buttonAddTagPreviewImage.setOnClickListener { onClickAddTag() }
         binding.buttonPublishPhoto.setOnClickListener {
             it.isEnabled = false
-            onClickPublish()
-            it.isEnabled = true
+            binding.layoutPushPhoto.visibility = View.VISIBLE
 
+            it.post {
+                dataPreparation()
+                binding.layoutPushPhoto.visibility = View.GONE
+                it.isEnabled = true
+            }
         }
     }
 
@@ -130,10 +135,66 @@ class PreviewImageFragment : Fragment() {
         binding.tagsContainer.addView(rowLayout)
     }
 
-    private fun onClickPublish() {
+    private fun dataPreparation() {
         val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-        val username = pref.getString(PrefKeys.USERNAME, "")!!
 
+        val username = pref.getString(PrefKeys.USERNAME, "")!!
+        val name = getName()
+        val tags = getTags()
+        val bitmap = getImage()
+
+        if (tags.isNullOrEmpty() || name.isNullOrEmpty() || bitmap == null)
+            return
+
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
+        val imageBytes = stream.toByteArray()
+        val requestFile = imageBytes.toRequestBody("image/jpeg".toMediaType())
+
+        val usernamePart = username.toRequestBody("text/plain".toMediaType())
+        val namePart = name.toRequestBody("text/plain".toMediaType())
+        val tagsParts = tags.toRequestBody("text/plain".toMediaType())
+        val imagePart = MultipartBody.Part.createFormData("image", "photo.jpg", requestFile)
+
+        publicPhoto(usernamePart, namePart, tagsParts, imagePart)
+    }
+
+    private fun publicPhoto(
+        username: RequestBody,
+        name: RequestBody,
+        tags: RequestBody,
+        image: MultipartBody.Part
+    ) {
+        lifecycleScope.launch {
+            try {
+                ApiClient.apiService.addItem(username, name, tags, image)
+                Toast.makeText(
+                    requireContext(),
+                    "Успешно",
+                    Toast.LENGTH_LONG
+                ).show()
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            } catch (e: HttpException) {
+                val errorJson = e.response()?.errorBody()?.string()
+                    ?: "{\"detail\": \"Ошибка сервера\"}"
+                val detail = JSONObject(errorJson).getString("detail")
+                Log.e("ERRORRR", detail)
+                Toast.makeText(
+                    requireContext(),
+                    detail,
+                    Toast.LENGTH_LONG
+                ).show()
+            } catch (e: IOException) {
+                Toast.makeText(
+                    requireContext(),
+                    "Ошибка сети попробуйте позже",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    private fun getName(): String? {
         val name = binding.titleEditTextFragmentPreviewImage.text?.toString()?.trim()
 
         if (name.isNullOrEmpty()) {
@@ -144,9 +205,12 @@ class PreviewImageFragment : Fragment() {
                     dialog.dismiss()
                 }
                 .show()
-            return
+            return null
         }
+        return name
+    }
 
+    private fun getTags(): String? {
         var tagsString = ""
         for (i in 0 until binding.tagsContainer.childCount) {
             val row = binding.tagsContainer.getChildAt(0) as LinearLayout
@@ -161,6 +225,20 @@ class PreviewImageFragment : Fragment() {
         }
         tagsString = tagsString.trim()
 
+        if (tagsString.isEmpty()) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Ошибка")
+                .setMessage("Добавьте хотя-бы один тэг")
+                .setPositiveButton("Ок") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+            return null
+        }
+        return tagsString
+    }
+
+    private fun getImage(): Bitmap? {
         val imageView = binding.imageFragmentPreviewImage
         val bitmap = (imageView.drawable as? BitmapDrawable)?.bitmap
         if (bitmap == null) {
@@ -169,49 +247,9 @@ class PreviewImageFragment : Fragment() {
                 .setMessage("Фото не выбрано")
                 .setPositiveButton("Ок") { dialog, _ -> dialog.dismiss() }
                 .show()
-            return
+            return null
         }
-
-        publicPhoto(username, name, tagsString, bitmap)
-    }
-
-    private fun publicPhoto(username: String, name: String, tags: String, bitmap: Bitmap) {
-        val usernamePart = username.toRequestBody("text/plain".toMediaType())
-        val namePart = name.toRequestBody("text/plain".toMediaType())
-        val tagsParts = tags.toRequestBody("text/plain".toMediaType())
-
-        val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
-        val imageBytes = stream.toByteArray()
-        val requestFile = imageBytes.toRequestBody("image/jpeg".toMediaType())
-        val imagePart = MultipartBody.Part.createFormData("image", "photo.jpg", requestFile)
-
-        lifecycleScope.launch {
-            try {
-                ApiClient.apiService.addItem(usernamePart, namePart, tagsParts, imagePart)
-                Toast.makeText(
-                    requireContext(),
-                    "Успешно",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } catch (e: HttpException) {
-                val errorJson = e.response()?.errorBody()?.string()
-                    ?: "{\"detail\": \"Ошибка сервера\"}"
-                val detail = JSONObject(errorJson).getString("detail")
-                Log.e("ERRORRR", detail)
-                Toast.makeText(
-                    requireContext(),
-                    detail,
-                    Toast.LENGTH_SHORT
-                ).show()
-            } catch (e: IOException) {
-                Toast.makeText(
-                    requireContext(),
-                    "Ошибка сети попробуйте позже",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
+        return bitmap
     }
 
     private fun Int.dp(): Int =
