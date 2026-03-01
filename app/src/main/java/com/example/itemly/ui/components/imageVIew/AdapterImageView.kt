@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.itemly.R
+import com.example.itemly.data.api.ApiConstants
 import com.example.itemly.data.model.home.ItemDataSchema
 
 class AdapterImageView(
@@ -29,7 +30,7 @@ class AdapterImageView(
         val item = data[position]
 
         Glide.with(holder.image.context)
-            .load(item.imageUrl)
+            .load(ApiConstants.BASE_URL + item.imageUrl)
             .into(holder.image)
         holder.itemView.setOnClickListener { onClickItem(item) }
     }

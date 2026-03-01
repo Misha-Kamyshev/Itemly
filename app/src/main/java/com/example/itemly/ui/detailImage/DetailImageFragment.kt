@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
+import com.example.itemly.data.api.ApiConstants
 import com.example.itemly.data.model.home.ItemDataSchema
 import com.example.itemly.databinding.FragmentDetailImageBinding
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
@@ -31,7 +32,7 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         Glide.with(binding.mainImageFragmentDetailImage.context)
-            .load(data.imageUrl)
+            .load(ApiConstants.BASE_URL + data.imageUrl)
             .into(binding.mainImageFragmentDetailImage)
 
         binding.buttonBackFragmentDetailImage.setOnClickListener { }
