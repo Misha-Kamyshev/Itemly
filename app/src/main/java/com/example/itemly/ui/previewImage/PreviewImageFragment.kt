@@ -6,7 +6,6 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -178,7 +177,6 @@ class PreviewImageFragment : Fragment() {
                 val errorJson = e.response()?.errorBody()?.string()
                     ?: "{\"detail\": \"Ошибка сервера\"}"
                 val detail = JSONObject(errorJson).getString("detail")
-                Log.e("ERRORRR", detail)
                 Toast.makeText(
                     requireContext(),
                     detail,

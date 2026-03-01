@@ -1,29 +1,72 @@
 package com.example.itemly.ui.viewModel
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.itemly.data.api.ApiClient
-import com.example.itemly.data.model.home.HomeData
-import com.example.itemly.data.objects.PrefKeys
+import com.example.itemly.data.model.home.HomeRequest
+import com.example.itemly.data.model.home.ItemDataSchema
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import retrofit2.HttpException
+import java.io.IOException
 
 class HomeViewModel : ViewModel() {
-    private val _homeData = MutableLiveData<HomeData>()
-    val homeData: LiveData<HomeData> = _homeData
+    private val _items = MutableLiveData<List<ItemDataSchema>>(emptyList())
+    val items: LiveData<List<ItemDataSchema>> = _items
 
-    fun loadData(context: Context) {
-        if (_homeData.value != null) return
+    private var isLoading = false
+    private var isLastPage = false
+    private var lastId: Int? = null
 
-        val pref = context.getSharedPreferences(PrefKeys.USERNAME, Context.MODE_PRIVATE)
-        val username = pref.getString(PrefKeys.USERNAME, null)
+    fun loadFirstPage(username: String, context: Context) {
+        if (_items.value!!.isNotEmpty()) return
+        loadPage(username, context)
+    }
+
+    fun loadNextPage(username: String, context: Context) {
+        if (isLoading || isLastPage) return
+        loadPage(username, context)
+    }
+
+    private fun loadPage(username: String, context: Context) {
+        isLoading = true
 
         viewModelScope.launch {
-            val imageList = runCatching {
-                ApiClient.apiService.getMain(username)
-            }.getOrNull()
+            try {
+                val response = ApiClient.apiService.getMain(HomeRequest(username, lastId))
+
+                val newItems = response.items
+
+                if (newItems.isEmpty()) {
+                    isLastPage = true
+                } else {
+                    val updatedList = _items.value!! + newItems
+                    _items.value = updatedList
+                    lastId = newItems.last().id
+                    isLastPage = !response.hasNext
+                }
+            } catch (e: HttpException) {
+                val errorJson = e.response()?.errorBody()?.string()
+                    ?: "{\"detail\": \"Ошибка сервера\"}"
+                val detail = JSONObject(errorJson).getString("detail")
+                Toast.makeText(
+                    context,
+                    detail,
+                    Toast.LENGTH_LONG
+                ).show()
+            } catch (e: IOException) {
+                Toast.makeText(
+                    context,
+                    "Ошибка сети попробуйте позже",
+                    Toast.LENGTH_LONG
+                ).show()
+            } finally {
+                isLoading = false
+            }
         }
     }
 }
