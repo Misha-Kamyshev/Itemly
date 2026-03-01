@@ -32,13 +32,14 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-        val username = pref.getString(PrefKeys.USERNAME, "")!!
+        setupAdapter()
+    }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupAdapter() {
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
@@ -46,28 +47,11 @@ class HomeFragment : Fragment() {
             if (!binding.editSearch.hasFocus())
                 (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(item))
         }
-        viewModel.items.observe(viewLifecycleOwner) { items ->
-            adapter.submitList(items.toMutableList())
-        }
-        viewModel.loadFirstPage(username, requireContext())
 
         binding.recyclerFragmentHome.apply {
             layoutManager = layout
 
             this.adapter = adapter
-
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-                    val totalItemCount = layout.itemCount
-                    val lastVisibleItems = layout.findLastVisibleItemPositions(null)
-                    val lastVisibleItem = lastVisibleItems.maxOrNull() ?: 0
-
-                    if (lastVisibleItem + 5 >= totalItemCount) {
-                        viewModel.loadNextPage(username, requireContext())
-                    }
-                }
-            })
 
             setOnTouchListener { _, _ ->
                 if (binding.editSearch.hasFocus()) {
@@ -80,5 +64,33 @@ class HomeFragment : Fragment() {
                 false
             }
         }
+
+        subscribeDataForAdapter(adapter, layout)
+    }
+
+    private fun subscribeDataForAdapter(
+        adapter: AdapterImageView,
+        layout: StaggeredGridLayoutManager
+    ) {
+        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
+        val username = pref.getString(PrefKeys.USERNAME, "")!!
+
+        binding.recyclerFragmentHome.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val totalItemCount = layout.itemCount
+                val lastVisibleItems = layout.findLastVisibleItemPositions(null)
+                val lastVisibleItem = lastVisibleItems.maxOrNull() ?: 0
+
+                if (lastVisibleItem + 5 >= totalItemCount) {
+                    viewModel.loadNextPage(username, requireContext())
+                }
+            }
+        })
+
+        viewModel.items.observe(viewLifecycleOwner) { items ->
+            adapter.submitList(items.toMutableList())
+        }
+        viewModel.loadFirstPage(username, requireContext())
     }
 }
