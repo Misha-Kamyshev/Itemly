@@ -25,7 +25,6 @@ interface ApiService {
     suspend fun updateToken(@Body refreshToken: String): DataAuthorizationPull
 
     @POST("items/get_main")
-    suspend fun getMain(@Body username: String?): HomeData
     suspend fun getMain(@Body request: HomeRequest): HomeData
 
     @Multipart

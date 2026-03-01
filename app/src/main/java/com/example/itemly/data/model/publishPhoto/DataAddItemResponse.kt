@@ -1,11 +1,11 @@
 package com.example.itemly.data.model.publishPhoto
 
-import kotlinx.serialization.SerialName
+import com.google.gson.annotations.SerializedName
 
 data class DataAddItemResponse(
-    @SerialName("item_id")
+    @SerializedName("item_id")
     val itemId: Int,
     val tags: List<String>,
-    @SerialName("image_url")
+    @SerializedName("image_url")
     val imageUrl: String
 )

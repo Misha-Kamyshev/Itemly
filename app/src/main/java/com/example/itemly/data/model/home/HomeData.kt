@@ -1,15 +1,17 @@
 package com.example.itemly.data.model.home
 
-import kotlinx.serialization.SerialName
+import com.google.gson.annotations.SerializedName
+
 
 data class ItemDataSchema(
     val id: Int,
+    @SerializedName("image_url")
     val imageUrl: String
 )
 
 data class HomeData(
     val items: List<ItemDataSchema>,
-    @SerialName("has_next")
+    @SerializedName("has_next")
     val hasNext: Boolean
 )
 
