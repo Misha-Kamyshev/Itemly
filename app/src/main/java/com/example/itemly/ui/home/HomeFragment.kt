@@ -40,6 +40,8 @@ class HomeFragment : Fragment() {
         val username = pref.getString(PrefKeys.USERNAME, "")!!
 
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+
         val adapter = AdapterImageView(mutableListOf()) { item ->
             if (!binding.editSearch.hasFocus())
                 (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(item))
