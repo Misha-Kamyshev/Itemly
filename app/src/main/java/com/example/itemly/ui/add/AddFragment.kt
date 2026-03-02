@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -19,7 +20,8 @@ import com.example.itemly.databinding.FragmentAddPhotoBinding
 import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.ui.previewImage.PreviewImageFragment
 import com.example.itemly.utils.GridSpacingItemDecoration
-import com.example.itemly.utils.loadImages
+import com.example.itemly.utils.loadAlbums
+import com.example.itemly.utils.loadImagesFromAlbum
 
 class AddFragment : Fragment() {
     private var _binding: FragmentAddPhotoBinding? = null
@@ -59,6 +61,10 @@ class AddFragment : Fragment() {
             }
             (activity as? MainActivity)?.openDetailFragment(fragment)
         }
+
+        binding.buttonBackFragmentAdd.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
     }
 
     private fun getReadPermission(): String {
@@ -84,6 +90,20 @@ class AddFragment : Fragment() {
     }
 
     private fun showGalleryLayout() {
+        val adapter = AdapterGalleryLayout(
+            onClickCamera = {
+                cameraPhotoUri = createImageUri()
+                takePictureLauncher.launch(cameraPhotoUri)
+            },
+            onClickImage = { item ->
+                if (item != null) {
+                    binding.acceptSelectedFragmentAddPhoto.visibility = View.VISIBLE
+                    this@AddFragment.selectedImage = item
+                } else
+                    binding.acceptSelectedFragmentAddPhoto.visibility = View.GONE
+            })
+
+
         binding.galleryLayoutAddPhotoFragment.visibility = View.VISIBLE
         binding.noAccessLayoutAddPhotoFragment.visibility = View.GONE
 
@@ -97,20 +117,7 @@ class AddFragment : Fragment() {
         val spacing = resources.getDimensionPixelSize(R.dimen.spacing_image_gallery)
 
         binding.recyclerLayoutAddPhotoFragment.apply {
-            adapter = AdapterGalleryLayout(
-                loadImages(requireContext()),
-                onClickCamera = {
-                    cameraPhotoUri = createImageUri()
-                    takePictureLauncher.launch(cameraPhotoUri)
-                },
-                onClickImage = { item ->
-                    if (item != null) {
-                        binding.acceptSelectedFragmentAddPhoto.visibility = View.VISIBLE
-                        this@AddFragment.selectedImage = item
-                    } else
-                        binding.acceptSelectedFragmentAddPhoto.visibility = View.GONE
-                })
-
+            this.adapter = adapter
             layoutManager = GridLayoutManager(
                 requireContext(),
                 3,
@@ -124,6 +131,31 @@ class AddFragment : Fragment() {
                     true
                 )
             )
+        }
+
+        listAlbum(adapter)
+    }
+
+    private fun listAlbum(adapter: AdapterGalleryLayout) {
+        val albums = loadAlbums(requireContext())
+
+        val adapterList = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_list_item_1,
+            albums.map { it.name }
+        )
+
+        binding.actvAlbums.setAdapter(adapterList)
+
+        binding.actvAlbums.setOnItemClickListener { _, _, position, _ ->
+            val selectedAlbum = albums[position]
+
+            val images = loadImagesFromAlbum(
+                requireContext(),
+                selectedAlbum.id
+            )
+
+            adapter.submitList(images)
         }
     }
 

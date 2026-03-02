@@ -65,6 +65,10 @@ class PreviewImageFragment : Fragment() {
                 it.isEnabled = true
             }
         }
+
+        binding.buttonBackFragmentPreviewImage.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
     }
 
     private fun onClickAddTag() {

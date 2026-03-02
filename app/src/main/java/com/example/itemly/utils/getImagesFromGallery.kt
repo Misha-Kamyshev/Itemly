@@ -3,25 +3,98 @@ package com.example.itemly.utils
 import android.content.ContentUris
 import android.content.Context
 import android.provider.MediaStore
+import com.example.itemly.data.model.addPhoto.Album
 import com.example.itemly.data.model.addPhoto.DataPhoto
 
-fun loadImages(context: Context): List<DataPhoto> {
+fun loadAlbums(context: Context): List<Album> {
+
+    val albums = mutableListOf<Album>()
+
+    val collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+    val projection = arrayOf(
+        MediaStore.Images.Media.BUCKET_ID,
+        MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+        MediaStore.Images.Media._ID
+    )
+
+    val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+
+    val albumMap = mutableMapOf<Long, Pair<String?, MutableList<Long>>>()
+
+    context.contentResolver.query(
+        collection,
+        projection,
+        null,
+        null,
+        sortOrder
+    )?.use { cursor ->
+
+        val bucketIdColumn =
+            cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID)
+
+        val bucketNameColumn =
+            cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+
+        val idColumn =
+            cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+
+        while (cursor.moveToNext()) {
+
+            val bucketId = cursor.getLong(bucketIdColumn)
+            val bucketName = cursor.getString(bucketNameColumn)
+            val imageId = cursor.getLong(idColumn)
+
+            val entry = albumMap.getOrPut(bucketId) {
+                bucketName to mutableListOf()
+            }
+
+            entry.second.add(imageId)
+        }
+    }
+
+    albumMap.forEach { (bucketId, pair) ->
+
+        val bucketName = pair.first ?: "Unknown"
+        val imageIds = pair.second
+
+        if (imageIds.isNotEmpty()) {
+
+            val firstImageId = imageIds.first()
+
+            val coverUri = ContentUris.withAppendedId(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                firstImageId
+            )
+
+            albums.add(
+                Album(
+                    id = bucketId,
+                    name = bucketName,
+                    coverUri = coverUri,
+                    photoCount = imageIds.size
+                )
+            )
+        }
+    }
+
+    return albums
+}
+
+fun loadImagesFromAlbum(context: Context, bucketId: Long): List<DataPhoto> {
 
     val images = mutableListOf<DataPhoto>()
 
-    val collection = MediaStore.Files.getContentUri("external")
+    val collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
     val projection = arrayOf(
-        MediaStore.Files.FileColumns._ID,
-        MediaStore.Files.FileColumns.MEDIA_TYPE
+        MediaStore.Images.Media._ID
     )
 
-    val selection = "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?"
-    val selectionArgs = arrayOf(
-        MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString()
-    )
+    val selection = "${MediaStore.Images.Media.BUCKET_ID}=?"
+    val selectionArgs = arrayOf(bucketId.toString())
 
-    val sortOrder = "${MediaStore.Files.FileColumns.DATE_ADDED} DESC"
+    val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
     context.contentResolver.query(
         collection,
@@ -32,17 +105,17 @@ fun loadImages(context: Context): List<DataPhoto> {
     )?.use { cursor ->
 
         val idColumn =
-            cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)
+            cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
 
         while (cursor.moveToNext()) {
             val id = cursor.getLong(idColumn)
 
-            val contentUri = ContentUris.withAppendedId(
+            val uri = ContentUris.withAppendedId(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 id
             )
 
-            images.add(DataPhoto(id, contentUri))
+            images.add(DataPhoto(id, uri))
         }
     }
 

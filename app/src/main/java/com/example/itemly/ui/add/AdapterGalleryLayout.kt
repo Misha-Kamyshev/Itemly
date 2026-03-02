@@ -12,12 +12,13 @@ import com.bumptech.glide.Glide
 import com.example.itemly.R
 import com.example.itemly.data.model.addPhoto.DataPhoto
 import com.google.android.material.card.MaterialCardView
+import androidx.core.graphics.drawable.toDrawable
 
 class AdapterGalleryLayout(
-    private val dataGallery: List<DataPhoto>,
     private val onClickCamera: () -> Unit,
     private val onClickImage: (Uri?) -> Unit
 ) : RecyclerView.Adapter<AdapterGalleryLayout.ViewHolder>() {
+    private var dataGallery: List<DataPhoto> = emptyList()
     private var selectedPosition: Int = RecyclerView.NO_POSITION
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -40,9 +41,11 @@ class AdapterGalleryLayout(
         holder.itemView.background = null
 
         if (position == 0) {
-            holder.itemView.background = ColorDrawable(
-                ContextCompat.getColor(holder.itemView.context, android.R.color.black)
-            )
+            holder.itemView.background = ContextCompat.getColor(
+                holder.itemView.context,
+                android.R.color.black
+            ).toDrawable()
+
             holder.camera.visibility = View.VISIBLE
 
             holder.itemView.setOnClickListener { onClickCamera() }
@@ -75,4 +78,10 @@ class AdapterGalleryLayout(
     }
 
     override fun getItemCount(): Int = dataGallery.size + 1
+
+    fun submitList(newList: List<DataPhoto>) {
+        dataGallery = newList
+        selectedPosition = RecyclerView.NO_POSITION
+        notifyDataSetChanged()
+    }
 }
