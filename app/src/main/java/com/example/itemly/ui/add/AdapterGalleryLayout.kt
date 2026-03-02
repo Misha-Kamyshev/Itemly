@@ -1,4 +1,4 @@
-package com.example.itemly.ui.addPhoto
+package com.example.itemly.ui.add
 
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
