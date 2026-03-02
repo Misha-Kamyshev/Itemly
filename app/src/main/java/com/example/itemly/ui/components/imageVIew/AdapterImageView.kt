@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.itemly.R
 import com.example.itemly.data.api.ApiConstants
-import com.example.itemly.data.model.home.ItemDataSchema
+import com.example.itemly.data.model.item.ItemDataSchema
 
 class AdapterImageView(
     private val data: MutableList<ItemDataSchema>,

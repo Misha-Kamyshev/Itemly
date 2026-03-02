@@ -3,8 +3,8 @@ package com.example.itemly.data.api
 import com.example.itemly.data.model.authorization.DataAuthorizationPull
 import com.example.itemly.data.model.authorization.DataAuthorizationPush
 import com.example.itemly.data.model.authorization.DataRegistrationPush
-import com.example.itemly.data.model.home.HomeData
-import com.example.itemly.data.model.home.HomeRequest
+import com.example.itemly.data.model.item.ItemData
+import com.example.itemly.data.model.item.ItemRequest
 import com.example.itemly.data.model.publishPhoto.DataAddItemResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -26,6 +26,7 @@ interface ApiService {
 
     @POST("items/get_main")
     suspend fun getMain(@Body request: HomeRequest): HomeData
+    suspend fun getMain(@Body request: ItemRequest): ItemData
 
     @Multipart
     @POST("/items/add_item")

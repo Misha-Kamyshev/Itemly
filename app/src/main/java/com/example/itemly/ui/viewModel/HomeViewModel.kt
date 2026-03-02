@@ -7,8 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.itemly.data.api.ApiClient
-import com.example.itemly.data.model.home.HomeRequest
-import com.example.itemly.data.model.home.ItemDataSchema
+import com.example.itemly.data.model.item.ItemRequest
+import com.example.itemly.data.model.item.ItemDataSchema
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.HttpException
@@ -37,7 +37,7 @@ class HomeViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val response = ApiClient.apiService.getMain(HomeRequest(username, lastId))
+                val response = ApiClient.apiService.getMain(ItemRequest(username, lastId))
 
                 val newItems = response.items
 
