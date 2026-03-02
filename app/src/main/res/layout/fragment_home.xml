@@ -14,7 +14,7 @@
             android:id="@+id/searchLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Поиск"
+            android:hint="@string/hint_search"
             app:boxBackgroundMode="outline"
             app:boxCornerRadiusBottomEnd="20dp"
             app:boxCornerRadiusBottomStart="20dp"
