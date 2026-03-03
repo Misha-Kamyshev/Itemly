@@ -9,13 +9,19 @@ data class ItemDataSchema(
     val imageUrl: String
 )
 
-data class ItemData(
+data class ItemsData(
     val items: List<ItemDataSchema>,
     @SerializedName("has_next")
     val hasNext: Boolean
 )
 
-data class ItemRequest(
+data class ItemsRequest(
     val username: String,
-    val last_id: Int? = null
+    @SerializedName("last_id")
+    val lastId: Int? = null
+)
+
+data class ItemRequest(
+    val id: Int,
+    val username: String
 )
