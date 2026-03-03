@@ -109,14 +109,10 @@ class RegFragment : Fragment() {
                 binding.editPasswordSecondSignUp.setText("")
 
                 (requireActivity() as MainActivity).onLoginSuccess()
-            } catch (e: HttpException) {
-                val errorJson = e.response()?.errorBody()?.string()
-                    ?: "{\"detail\": \"Ошибка сервера\"}"
-                val detail = JSONObject(errorJson).getString("detail")
-
-                binding.errorSignUpTextView.text = detail
+            } catch (_: HttpException) {
+                binding.errorSignUpTextView.text = "Ошибка сервера, попробуйте позже"
                 binding.errorSignUpTextView.visibility = View.VISIBLE
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 binding.errorSignUpTextView.text = "Ошибка сети, попробуйте позже"
                 binding.errorSignUpTextView.visibility = View.VISIBLE
             } finally {

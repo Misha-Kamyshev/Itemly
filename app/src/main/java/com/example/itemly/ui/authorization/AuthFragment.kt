@@ -98,14 +98,10 @@ class AuthFragment : Fragment() {
                 binding.editPasswordSignIn.setText("")
 
                 (requireActivity() as MainActivity).onLoginSuccess()
-            } catch (e: HttpException) {
-                val errorJson = e.response()?.errorBody()?.string()
-                    ?: "{\"detail\": \"Ошибка сервера\"}"
-                val detail = JSONObject(errorJson).getString("detail")
-
-                binding.errorSignInTextView.text = detail
+            } catch (_: HttpException) {
+                binding.errorSignInTextView.text = "Ошибка сервера, попробуйте позже"
                 binding.errorSignInTextView.visibility = View.VISIBLE
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 binding.errorSignInTextView.text = "Ошибка сети, попробуйте позже"
                 binding.errorSignInTextView.visibility = View.VISIBLE
             } finally {

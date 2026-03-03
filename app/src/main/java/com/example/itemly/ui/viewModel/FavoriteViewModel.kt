@@ -49,9 +49,9 @@ class FavoriteViewModel : ViewModel() {
                     lastId = newItems.last().id
                     isLastPage = !response.hasNext
                 }
-            } catch (e: HttpException) {
-                httpToast(e, context)
-            } catch (e: IOException) {
+            } catch (_: HttpException) {
+                httpToast(context)
+            } catch (_: IOException) {
                 ioToast(context)
             } finally {
                 isLoading = false

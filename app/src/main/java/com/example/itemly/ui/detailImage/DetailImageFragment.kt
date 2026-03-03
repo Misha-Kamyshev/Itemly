@@ -99,9 +99,9 @@ class DetailImageFragment(
             try {
                 val response = ApiClient.apiService.getTags(data.id)
                 adapter.submitData(response)
-            } catch (e: HttpException) {
-                httpToast(e, context)
-            } catch (e: IOException) {
+            } catch (_: HttpException) {
+                httpToast(context)
+            } catch (_: IOException) {
                 ioToast(context)
             }
         }
@@ -115,9 +115,9 @@ class DetailImageFragment(
             try {
                 ApiClient.apiService.saveItem(ItemRequest(data.id, username))
                 myImage.value = true
-            } catch (e: HttpException) {
-                httpToast(e, context)
-            } catch (e: IOException) {
+            } catch (_: HttpException) {
+                httpToast(context)
+            } catch (_: IOException) {
                 ioToast(context)
             }
         }
@@ -132,9 +132,9 @@ class DetailImageFragment(
                 ApiClient.apiService.deleteFavoriteItem(ItemRequest(data.id, username))
                 favoriteViewModel.removeItem(data.id)
                 myImage.value = false
-            } catch (e: HttpException) {
-                httpToast(e, context)
-            } catch (e: IOException) {
+            } catch (_: HttpException) {
+                httpToast(context)
+            } catch (_: IOException) {
                 ioToast(context)
             }
         }

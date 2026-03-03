@@ -5,6 +5,8 @@ import android.widget.Toast
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.data.api.ApiClient
 import com.example.itemly.data.objects.CodeToken
+import com.example.itemly.ui.components.httpToast
+import com.example.itemly.ui.components.ioToast
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -37,16 +39,12 @@ private suspend fun request(context: Context, refreshToken: String): Int {
 
             return CodeToken.ERROR_TOKEN
         } else {
-            Toast
-                .makeText(context, "Ошибка сервера, попробуйте позже", Toast.LENGTH_LONG)
-                .show()
+            httpToast(context)
 
             return CodeToken.ERROR_SERVER
         }
-    } catch (e: IOException) {
-        Toast
-            .makeText(context, "Ошибка сети, попробуйте позже", Toast.LENGTH_LONG)
-            .show()
+    } catch (_: IOException) {
+        ioToast(context)
 
         return CodeToken.ERROR_INTERNET
     }

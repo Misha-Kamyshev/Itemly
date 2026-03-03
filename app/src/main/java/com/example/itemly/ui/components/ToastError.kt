@@ -5,13 +5,10 @@ import android.widget.Toast
 import org.json.JSONObject
 import retrofit2.HttpException
 
-fun httpToast(e: HttpException, context: Context?) {
-    val errorJson = e.response()?.errorBody()?.string()
-        ?: "{\"detail\": \"Ошибка сервера\"}"
-    val detail = JSONObject(errorJson).getString("detail")
+fun httpToast(context: Context?) {
     Toast.makeText(
         context,
-        detail,
+        "Ошибка сервера, попробуйте позже",
         Toast.LENGTH_LONG
     ).show()
 }

@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.itemly.data.api.ApiClient
 import com.example.itemly.data.model.item.ItemDataSchema
 import com.example.itemly.data.model.item.ItemsRequest
+import com.example.itemly.ui.components.httpToast
+import com.example.itemly.ui.components.ioToast
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.HttpException
@@ -49,21 +51,10 @@ class MyImageViewModel : ViewModel() {
                     lastId = newItems.last().id
                     isLastPage = !response.hasNext
                 }
-            } catch (e: HttpException) {
-                val errorJson = e.response()?.errorBody()?.string()
-                    ?: "{\"detail\": \"Ошибка сервера\"}"
-                val detail = JSONObject(errorJson).getString("detail")
-                Toast.makeText(
-                    context,
-                    detail,
-                    Toast.LENGTH_LONG
-                ).show()
-            } catch (e: IOException) {
-                Toast.makeText(
-                    context,
-                    "Ошибка сети попробуйте позже",
-                    Toast.LENGTH_LONG
-                ).show()
+            } catch (_: HttpException) {
+                httpToast(context)
+            } catch (_: IOException) {
+                ioToast(context)
             } finally {
                 isLoading = false
             }

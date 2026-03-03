@@ -22,6 +22,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.itemly.R
 import com.example.itemly.data.api.ApiClient
 import com.example.itemly.data.objects.PrefKeys
+import com.example.itemly.ui.components.httpToast
+import com.example.itemly.ui.components.ioToast
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -204,21 +206,10 @@ class PreviewImageFragment : Fragment() {
                 ).show()
                 backCallback.isEnabled = false
                 requireActivity().onBackPressedDispatcher.onBackPressed()
-            } catch (e: HttpException) {
-                val errorJson = e.response()?.errorBody()?.string()
-                    ?: "{\"detail\": \"Ошибка сервера\"}"
-                val detail = JSONObject(errorJson).getString("detail")
-                Toast.makeText(
-                    requireContext(),
-                    detail,
-                    Toast.LENGTH_LONG
-                ).show()
-            } catch (e: IOException) {
-                Toast.makeText(
-                    requireContext(),
-                    "Ошибка сети попробуйте позже",
-                    Toast.LENGTH_LONG
-                ).show()
+            } catch (_: HttpException) {
+                httpToast(requireContext())
+            } catch (_: IOException) {
+                ioToast(requireContext())
             }
         }
     }
