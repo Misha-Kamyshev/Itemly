@@ -84,6 +84,8 @@ class AuthFragment : Fragment() {
     private fun request(login: String, password: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
+                binding.buttonSignIn.isEnabled = false
+
                 val response = ApiClient.apiService.signIn(
                     request = DataAuthorizationPush(
                         login = login,
@@ -91,6 +93,9 @@ class AuthFragment : Fragment() {
                     )
                 )
                 saveToken(requireContext(), response)
+
+                binding.editLoginSignIn.setText("")
+                binding.editPasswordSignIn.setText("")
 
                 (requireActivity() as MainActivity).onLoginSuccess()
             } catch (e: HttpException) {
@@ -103,6 +108,8 @@ class AuthFragment : Fragment() {
             } catch (e: IOException) {
                 binding.errorSignInTextView.text = "Ошибка сети, попробуйте позже"
                 binding.errorSignInTextView.visibility = View.VISIBLE
+            } finally {
+                binding.buttonSignIn.isEnabled = true
             }
         }
     }

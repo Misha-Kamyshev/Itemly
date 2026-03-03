@@ -92,6 +92,8 @@ class RegFragment : Fragment() {
     private fun request(username: String, email: String, password: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
+                binding.buttonSignUp.isEnabled = false
+
                 val response = ApiClient.apiService.signUp(
                     request = DataRegistrationPush(
                         username = username,
@@ -100,6 +102,11 @@ class RegFragment : Fragment() {
                     )
                 )
                 saveToken(requireContext(), response)
+
+                binding.editUsernameSignUp.setText("")
+                binding.editEmailSignUp.setText("")
+                binding.editPasswordSignUp.setText("")
+                binding.editPasswordSecondSignUp.setText("")
 
                 (requireActivity() as MainActivity).onLoginSuccess()
             } catch (e: HttpException) {
@@ -112,6 +119,8 @@ class RegFragment : Fragment() {
             } catch (e: IOException) {
                 binding.errorSignUpTextView.text = "Ошибка сети, попробуйте позже"
                 binding.errorSignUpTextView.visibility = View.VISIBLE
+            } finally {
+                binding.buttonSignUp.isEnabled = true
             }
         }
     }
