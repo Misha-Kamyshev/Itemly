@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -37,6 +38,7 @@ import java.io.IOException
 class PreviewImageFragment : Fragment() {
     private var _binding: FragmentPreviewImageBinding? = null
     private val binding get() = _binding!!
+    private lateinit var backCallback: OnBackPressedCallback
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +51,18 @@ class PreviewImageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        backCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showExitDialog()
+            }
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            backCallback
+        )
+
         val uriString = arguments?.getString("photo_uri")
         val photoUri = uriString?.toUri()
 
@@ -67,8 +81,20 @@ class PreviewImageFragment : Fragment() {
         }
 
         binding.buttonBackFragmentPreviewImage.setOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            showExitDialog()
         }
+    }
+
+    private fun showExitDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Выйти?")
+            .setMessage("Вы действительно хотите выйти без сохранения")
+            .setPositiveButton("Да") { _, _ ->
+                backCallback.isEnabled = false
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+            .setNegativeButton("Нет", null)
+            .show()
     }
 
     private fun onClickAddTag() {
@@ -176,6 +202,7 @@ class PreviewImageFragment : Fragment() {
                     "Успешно",
                     Toast.LENGTH_LONG
                 ).show()
+                backCallback.isEnabled = false
                 requireActivity().onBackPressedDispatcher.onBackPressed()
             } catch (e: HttpException) {
                 val errorJson = e.response()?.errorBody()?.string()
@@ -213,31 +240,31 @@ class PreviewImageFragment : Fragment() {
     }
 
     private fun getTags(): String? {
-        var tagsString = ""
+        val tagsBuilder = StringBuilder()
+
         for (i in 0 until binding.tagsContainer.childCount) {
-            val row = binding.tagsContainer.getChildAt(0) as LinearLayout
+            val row = binding.tagsContainer.getChildAt(i) as LinearLayout
             val textInputLayout = row.getChildAt(0) as TextInputLayout
             val editText = textInputLayout.editText
-            val tagText = editText?.text?.toString()?.trim()
+            val tagText = editText?.text?.toString()?.replace(" ", "")?.trimStart('#')
+
             if (!tagText.isNullOrEmpty()) {
-                var format = tagText.replace(" ", "").trimStart('#')
-                format = "#$format"
-                tagsString += format
+                tagsBuilder.append(tagText).append(";")
             }
         }
-        tagsString = tagsString.trim()
 
-        if (tagsString.isEmpty()) {
+        if (tagsBuilder.isEmpty()) {
             AlertDialog.Builder(requireContext())
                 .setTitle("Ошибка")
-                .setMessage("Добавьте хотя-бы один тэг")
+                .setMessage("Добавьте хотя бы один тэг")
                 .setPositiveButton("Ок") { dialog, _ ->
                     dialog.dismiss()
                 }
                 .show()
             return null
         }
-        return tagsString
+
+        return tagsBuilder.toString()
     }
 
     private fun getImage(): Bitmap? {
