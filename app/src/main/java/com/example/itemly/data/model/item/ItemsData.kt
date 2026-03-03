@@ -1,6 +1,7 @@
 package com.example.itemly.data.model.item
 
 import com.google.gson.annotations.SerializedName
+import org.w3c.dom.Comment
 
 
 data class ItemDataSchema(
@@ -24,4 +25,15 @@ data class ItemsRequest(
 data class ItemRequest(
     val id: Int,
     val username: String
+)
+
+data class ItemInformation(
+    val tags: List<String>,
+    val iconAuthor: String,
+    val author: String,
+    val name: String,
+    @SerializedName("count_like")
+    val countLike: Int = 0,
+    @SerializedName("count_comment")
+    val countComment: Int = 0
 )

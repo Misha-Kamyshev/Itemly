@@ -37,6 +37,9 @@ class DetailImageFragment(
     private var _binding: FragmentDetailImageBinding? = null
     private val binding get() = _binding!!
     private val favoriteViewModel: FavoriteViewModel by activityViewModels()
+    private lateinit var username: String
+    private val countLike = MutableLiveData(0)
+    private val countComment = MutableLiveData(0)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,7 +52,23 @@ class DetailImageFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
+        username = pref.getString(PrefKeys.USERNAME, "")!!
 
+        observeUI()
+
+        Glide.with(binding.mainImageFragmentDetailImage.context)
+            .load(ApiConstants.BASE_URL + data.imageUrl)
+            .into(binding.mainImageFragmentDetailImage)
+
+        binding.buttonBackFragmentDetailImage.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+
+        setupAdapters()
+    }
+
+    private fun observeUI() {
         myImage.observe(viewLifecycleOwner) {
             if (!it) {
                 binding.includeBlockTagsDetailImageFragment.containerSaveBlockTagsDetailImage.apply {
@@ -70,14 +89,18 @@ class DetailImageFragment(
             }
         }
 
-        Glide.with(binding.mainImageFragmentDetailImage.context)
-            .load(ApiConstants.BASE_URL + data.imageUrl)
-            .into(binding.mainImageFragmentDetailImage)
-
-        binding.buttonBackFragmentDetailImage.setOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+        countLike.observe(viewLifecycleOwner) {
+            binding.includeBlockTagsDetailImageFragment.countLike.text =
+                countLike.value!!.toString()
         }
 
+        countComment.observe(viewLifecycleOwner) {
+            binding.includeBlockTagsDetailImageFragment.countComment.text =
+                countComment.value!!.toString()
+        }
+    }
+
+    private fun setupAdapters() {
         val adapter = AdapterTagsDetailImageFragment {} // TODO
         binding.includeBlockTagsDetailImageFragment.tagsRecyclerDetailImage.apply {
             this.adapter = adapter
@@ -86,19 +109,53 @@ class DetailImageFragment(
                 flexWrap = FlexWrap.WRAP
             }
         }
+        getInformation(adapter)
+
         binding.recyclerFragmentDetailImage.apply {
             this.adapter = AdapterImageView(mutableListOf()) {}
             this.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         }
-
-        getTags(adapter)
     }
 
-    private fun getTags(adapter: AdapterTagsDetailImageFragment) {
+    private fun getInformation(adapter: AdapterTagsDetailImageFragment) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val response = ApiClient.apiService.getTags(data.id)
-                adapter.submitData(response)
+                val response = ApiClient.apiService.getInformation(data.id)
+                adapter.submitData(response.tags)
+                binding.includeBlockTagsDetailImageFragment.apply {
+                    countLike.text = response.countLike.toString()
+                    countComment.text = response.countComment.toString()
+                    usernameAuthor.text = response.author
+                    nameItem.text = response.name
+
+                    Glide.with(requireContext())
+                        .load(ApiConstants.BASE_URL + response.iconAuthor)
+                        .into(imageUserPushDetailImage)
+                }
+            } catch (_: HttpException) {
+                httpToast(context)
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            } catch (_: IOException) {
+                ioToast(context)
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+        }
+    }
+
+    private fun onClickLike() {
+        val imageLike = binding.includeBlockTagsDetailImageFragment.imageLike
+        val isSelected = imageLike.isSelected
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                if (!isSelected) {
+                    ApiClient.apiService.addLike(ItemRequest(data.id, username))
+                    countLike.value = countLike.value!! + 1
+                } else {
+                    ApiClient.apiService.deleteLike(ItemRequest(data.id, username))
+                    countLike.value = countLike.value!! - 1
+                }
+                imageLike.isSelected = !isSelected
             } catch (_: HttpException) {
                 httpToast(context)
             } catch (_: IOException) {
@@ -107,10 +164,11 @@ class DetailImageFragment(
         }
     }
 
-    private fun saveItem() {
-        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-        val username = pref.getString(PrefKeys.USERNAME, "")!!
+    private fun onClickComment() {
+        // TODO
+    }
 
+    private fun saveItem() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 ApiClient.apiService.saveItem(ItemRequest(data.id, username))
@@ -124,9 +182,6 @@ class DetailImageFragment(
     }
 
     private fun deleteItem() {
-        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-        val username = pref.getString(PrefKeys.USERNAME, "")!!
-
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 ApiClient.apiService.deleteFavoriteItem(ItemRequest(data.id, username))

@@ -20,6 +20,7 @@
             android:orientation="horizontal">
 
             <ImageView
+                android:id="@+id/imageLike"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginEnd="5dp"
@@ -28,6 +29,7 @@
                 app:tint="@color/black" />
 
             <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/countLike"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -49,6 +51,7 @@
                 app:tint="@color/black" />
 
             <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/countComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -100,6 +103,7 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/usernameAuthor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical" />
@@ -107,6 +111,7 @@
         </LinearLayout>
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/nameItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"

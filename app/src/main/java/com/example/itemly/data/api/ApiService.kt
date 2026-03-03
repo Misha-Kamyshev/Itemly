@@ -3,6 +3,7 @@ package com.example.itemly.data.api
 import com.example.itemly.data.model.authorization.DataAuthorizationPull
 import com.example.itemly.data.model.authorization.DataAuthorizationPush
 import com.example.itemly.data.model.authorization.DataRegistrationPush
+import com.example.itemly.data.model.item.ItemInformation
 import com.example.itemly.data.model.item.ItemRequest
 import com.example.itemly.data.model.item.ItemsData
 import com.example.itemly.data.model.item.ItemsRequest
@@ -29,8 +30,14 @@ interface ApiService {
     @POST("items/get_main")
     suspend fun getMain(@Body request: ItemsRequest): ItemsData
 
-    @GET("items/get_tags")
-    suspend fun getTags(@Query("id_item") id: Int): List<String>
+    @GET("items/get_information")
+    suspend fun getInformation(@Query("id_item") id: Int): ItemInformation // TODO Переделать эндпоинт на бэке
+
+    @POST("item/add_like")
+    suspend fun addLike(@Body request: ItemRequest): Response<Unit> // TODO Сделать эндпоинт
+
+    @POST("item/delete_like")
+    suspend fun deleteLike(@Body request: ItemRequest): Response<Unit> // TODO Сделать эндпоинт
 
     @Multipart
     @POST("/items/add_item")
