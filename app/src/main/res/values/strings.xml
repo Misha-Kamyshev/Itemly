@@ -3,4 +3,6 @@
 
     <string name="hint_search">Поиск</string>
     <string name="push_photo">Отправка фото…</string>
+    <string name="title_top_bar_favorite">Вы сохранили</string>
+    <string name="title_top_bar_my_image">Ваши фото</string>
 </resources>
