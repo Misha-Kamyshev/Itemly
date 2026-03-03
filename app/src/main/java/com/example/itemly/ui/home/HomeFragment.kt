@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.itemly.data.objects.PrefKeys
@@ -17,6 +18,7 @@ import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.detailImage.DetailImageFragment
 import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.ui.viewModel.HomeViewModel
+import com.example.itemly.utils.StaggeredGridSpacingItemDecoration
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
@@ -45,13 +47,20 @@ class HomeFragment : Fragment() {
 
         val adapter = AdapterImageView(mutableListOf()) { item ->
             if (!binding.editSearch.hasFocus())
-                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(item))
+                (activity as? MainActivity)?.openDetailFragment(
+                    DetailImageFragment(
+                        item,
+                        MutableLiveData(false)
+                    )
+                )
         }
 
         binding.recyclerFragmentHome.apply {
-            layoutManager = layout
-
             this.adapter = adapter
+            this.layoutManager = layout
+            this.addItemDecoration(
+                StaggeredGridSpacingItemDecoration(2, 10, true)
+            )
 
             setOnTouchListener { _, _ ->
                 if (binding.editSearch.hasFocus()) {

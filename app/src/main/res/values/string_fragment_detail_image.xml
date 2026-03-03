@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="buttonSaveTagsDetailImage">Сохранить</string>
+    <string name="buttonDeleteTagsDetailImage">Удалить</string>
     <string name="buttonGoProfileDetailImage">Перейти в профиль</string>
 </resources>
