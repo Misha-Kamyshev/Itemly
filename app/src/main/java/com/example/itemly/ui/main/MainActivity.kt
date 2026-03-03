@@ -8,25 +8,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.ActivityMainBinding
 import com.example.itemly.ui.add.AddFragment
-import com.example.itemly.ui.FavoriteFragment
-import com.example.itemly.ui.MyImageFragment
+import com.example.itemly.ui.favorite.FavoriteFragment
+import com.example.itemly.ui.myImage.MyImageFragment
 import com.example.itemly.ui.account.AccountFragment
 import com.example.itemly.ui.authorization.AuthFragment
 import com.example.itemly.ui.home.HomeFragment
 import com.example.itemly.ui.main.components.BottomBarView.Item
+import com.example.itemly.utils.logout
 
 class MainActivity : AppCompatActivity() {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
     private val mainStack = mutableListOf<String>()
     private val detailStack = mutableListOf<Fragment>()
-
-    companion object {
-        private const val DETAIL_STACK_TAG = "DETAIL_STACK"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,9 +70,7 @@ class MainActivity : AppCompatActivity() {
             openMainFragment("HOME", HomeFragment())
         } else {
             visibilityBottomBar(false)
-            supportFragmentManager.beginTransaction()
-                .replace(binding.containerFragment.id, AuthFragment())
-                .commitNow()
+            openMainFragment("AUTHORIZATION", AuthFragment())
         }
     }
 
@@ -99,28 +95,22 @@ class MainActivity : AppCompatActivity() {
             binding.bottomBar.visibility = View.GONE
     }
 
-    // Настройка backStack
     private fun handleBack(): Boolean {
         if (detailStack.isNotEmpty()) {
-            // удаляем текущий detail
             val fragment = detailStack.removeAt(detailStack.lastIndex)
             supportFragmentManager.beginTransaction().remove(fragment).commitNow()
 
-            // показываем предыдущий detail или основной экран
             val prev = detailStack.lastOrNull() ?: supportFragmentManager.findFragmentByTag(
                 mainStack.last()
             )
             prev?.let { supportFragmentManager.beginTransaction().show(it).commitNow() }
 
-            // управляем BottomBar
             binding.bottomBar.visibility = if (detailStack.isEmpty()) View.VISIBLE else View.GONE
 
-            // синхронизируем выделение mainStack, если detailStack пуст
             if (detailStack.isEmpty()) syncBottomBarSelection(mainStack.lastOrNull())
             return true
         }
 
-        // навигация по основным вкладкам
         if (mainStack.size > 1) {
             val current = mainStack.removeAt(mainStack.lastIndex)
             val prevTag = mainStack.last()
@@ -136,11 +126,31 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 
-    private fun clearDetailStack() {
-        supportFragmentManager.popBackStack(
-            DETAIL_STACK_TAG,
-            androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
-        )
+    private fun clearBackStack(clearMain: Boolean) {
+        if (detailStack.isEmpty()) return
+
+        val transaction = supportFragmentManager.beginTransaction()
+
+        detailStack.forEach { fragment ->
+            transaction.remove(fragment)
+        }
+
+        if (clearMain) {
+            mainStack.forEach { tag ->
+                supportFragmentManager.findFragmentByTag(tag)?.let {
+                    transaction.remove(it)
+                }
+            }
+        }
+
+        transaction.commitNow()
+
+        detailStack.clear()
+        if (clearMain) {
+            mainStack.clear()
+        }
+
+        binding.bottomBar.visibility = View.VISIBLE
     }
 
     private fun syncBottomBarSelection(tag: String? = mainStack.lastOrNull()) {
@@ -154,11 +164,10 @@ class MainActivity : AppCompatActivity() {
 
     // Управление фрагментами
     fun openMainFragment(tag: String, fragment: Fragment) {
-        clearDetailStack() // детали уничтожаем при смене основной вкладки
+        clearBackStack(false)
 
         val transaction = supportFragmentManager.beginTransaction()
 
-        // скрываем текущий фрагмент
         mainStack.lastOrNull()?.let { currentTag ->
             supportFragmentManager.findFragmentByTag(currentTag)?.let { transaction.hide(it) }
         }
@@ -172,7 +181,6 @@ class MainActivity : AppCompatActivity() {
 
         transaction.commitNow()
 
-        // обновляем стек
         mainStack.remove(tag)
         mainStack.add(tag)
 
@@ -182,7 +190,6 @@ class MainActivity : AppCompatActivity() {
     fun openDetailFragment(detailFragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
 
-        // скрываем текущий основной фрагмент или detail
         supportFragmentManager.fragments
             .firstOrNull { it.isVisible }?.let { transaction.hide(it) }
 
@@ -204,21 +211,18 @@ class MainActivity : AppCompatActivity() {
         binding.bottomBar.visibility = View.GONE
     }
 
-    fun closeAddFragment() {
-        handleBack()
+    fun onLoginSuccess() {
+        clearBackStack(true)
+
+        openMainFragment("HOME", HomeFragment())
+
+        visibilityBottomBar(true)
     }
 
-    fun onLoginSuccess() {
-        val fm = supportFragmentManager
-
-        fm.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
-        fm.executePendingTransactions()
-
-        fm.beginTransaction()
-            .replace(binding.containerFragment.id, HomeFragment(), "HOME")
-            .commitNow()
-
-        binding.bottomBar.visibility = View.VISIBLE
-        binding.bottomBar.select(Item.HOME)
+    fun logoutAccount() {
+        logout(this)
+        clearBackStack(true)
+        openMainFragment("AUTHORIZATION", AuthFragment())
+        visibilityBottomBar(false)
     }
 }
