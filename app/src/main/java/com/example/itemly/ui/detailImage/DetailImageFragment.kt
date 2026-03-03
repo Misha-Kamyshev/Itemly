@@ -74,18 +74,21 @@ class DetailImageFragment(
             .load(ApiConstants.BASE_URL + data.imageUrl)
             .into(binding.mainImageFragmentDetailImage)
 
-        binding.buttonBackFragmentDetailImage.setOnClickListener { }
         binding.buttonBackFragmentDetailImage.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+
+        val adapter = AdapterTagsDetailImageFragment {} // TODO
         binding.includeBlockTagsDetailImageFragment.tagsRecyclerDetailImage.apply {
-            adapter = AdapterTagsDetailImageFragment(listOf("#home", "#DIY", "#лайфхак", "#длядома", "#ремонт", "#ремонтдома")) {}
-            layoutManager = FlexboxLayoutManager(requireContext()).apply {
+            this.adapter = adapter
+            this.layoutManager = FlexboxLayoutManager(requireContext()).apply {
                 flexDirection = FlexDirection.ROW
                 flexWrap = FlexWrap.WRAP
             }
         }
         binding.recyclerFragmentDetailImage.apply {
+            this.adapter = AdapterImageView(mutableListOf()) {}
+            this.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         }
 
         getTags(adapter)

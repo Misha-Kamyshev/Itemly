@@ -8,9 +8,9 @@ import com.example.itemly.R
 import com.google.android.material.textview.MaterialTextView
 
 class AdapterTagsDetailImageFragment(
-    private val data: List<String>,
     private val onTagClick: (tag: String) -> Unit
 ) : RecyclerView.Adapter<AdapterTagsDetailImageFragment.ViewHolder>() {
+    private var data: List<String> = emptyList()
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tag: MaterialTextView = view.findViewById(R.id.textTagsItemTagsDetailImage)
     }
@@ -30,4 +30,9 @@ class AdapterTagsDetailImageFragment(
     }
 
     override fun getItemCount(): Int = data.size
+
+    fun submitData(newData: List<String>) {
+        data = newData
+        notifyDataSetChanged()
+    }
 }
