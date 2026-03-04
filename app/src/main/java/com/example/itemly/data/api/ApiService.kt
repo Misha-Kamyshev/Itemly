@@ -40,7 +40,7 @@ interface ApiService {
     suspend fun deleteLike(@Body request: ItemRequest): Response<Unit>
 
     @Multipart
-    @POST("/items/add_item")
+    @POST("items/add_item")
     suspend fun addItem(
         @Part("username") username: RequestBody,
         @Part("name_item") nameItem: RequestBody,
@@ -48,15 +48,15 @@ interface ApiService {
         @Part image: MultipartBody.Part
     ): Response<Unit>
 
-    @POST("/items/get_favorite")
+    @POST("items/get_favorite")
     suspend fun getFavorite(@Body request: ItemsRequest): ItemsData
 
-    @POST("/items/get_my_image")
+    @POST("items/get_my_image")
     suspend fun getMyImage(@Body request: ItemsRequest): ItemsData
 
-    @POST("/items/save_item")
+    @POST("items/save_item")
     suspend fun saveItem(@Body request: ItemRequest): Response<Unit>
 
-    @POST("/items/delete_favorite_item")
+    @POST("items/delete_favorite_item")
     suspend fun deleteFavoriteItem(@Body request: ItemRequest): Response<Unit>
 }
