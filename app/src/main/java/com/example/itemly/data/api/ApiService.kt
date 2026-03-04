@@ -31,13 +31,13 @@ interface ApiService {
     suspend fun getMain(@Body request: ItemsRequest): ItemsData
 
     @GET("items/get_information")
-    suspend fun getInformation(@Query("id_item") id: Int): ItemInformation // TODO Переделать эндпоинт на бэке
+    suspend fun getInformation(@Query("id_item") id: Int): ItemInformation
 
     @POST("item/add_like")
-    suspend fun addLike(@Body request: ItemRequest): Response<Unit> // TODO Сделать эндпоинт
+    suspend fun addLike(@Body request: ItemRequest): Response<Unit>
 
     @POST("item/delete_like")
-    suspend fun deleteLike(@Body request: ItemRequest): Response<Unit> // TODO Сделать эндпоинт
+    suspend fun deleteLike(@Body request: ItemRequest): Response<Unit>
 
     @Multipart
     @POST("/items/add_item")
