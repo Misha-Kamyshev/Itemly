@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.itemly.R
@@ -147,16 +148,15 @@ class AddFragment : Fragment() {
 
         binding.actvAlbums.setAdapter(adapterList)
 
-        binding.actvAlbums.setOnItemClickListener { _, _, position, _ ->
-            val selectedAlbum = albums[position]
+        binding.actvAlbums.doOnTextChanged { text, _, _, _ ->
+            val albumName = text?.toString() ?: return@doOnTextChanged
+            val selectedAlbum = albums.find { it.name == albumName } ?: return@doOnTextChanged
 
-            val images = loadImagesFromAlbum(
-                requireContext(),
-                selectedAlbum.id
-            )
-
+            val images = loadImagesFromAlbum(requireContext(), selectedAlbum.id)
             adapter.submitList(images)
         }
+
+        binding.actvAlbums.setText(albums.first().name, false)
     }
 
     private fun showNoAccessLayout() {
