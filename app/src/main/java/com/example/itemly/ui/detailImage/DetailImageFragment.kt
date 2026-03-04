@@ -65,6 +65,10 @@ class DetailImageFragment(
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
+        binding.includeBlockTagsDetailImageFragment.apply {
+            imageLike.setOnClickListener { onClickLike() }
+        }
+
         setupAdapters()
     }
 
