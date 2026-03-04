@@ -7,11 +7,13 @@ import com.example.itemly.data.model.authorization.DataAuthorizationPull
 
 fun saveToken(context: Context, response: DataAuthorizationPull) {
     val username = response.username
+    val email = response.email
     val accessToken = response.accessToken
     val refreshToken = response.refreshToken
 
     context.getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE).edit {
         putString(PrefKeys.USERNAME, username)
+        putString(PrefKeys.E_MAIL, email)
         putString(PrefKeys.ACCESS_TOKEN, accessToken)
         putString(PrefKeys.REFRESH_TOKEN, refreshToken)
         putBoolean(PrefKeys.IS_LOGIN, true)
