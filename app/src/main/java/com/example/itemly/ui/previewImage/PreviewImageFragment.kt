@@ -198,16 +198,18 @@ class PreviewImageFragment : Fragment() {
     ) {
         lifecycleScope.launch {
             try {
-                ApiClient.apiService.addItem(username, name, tags, image)
-                Toast.makeText(
-                    requireContext(),
-                    "Успешно",
-                    Toast.LENGTH_LONG
-                ).show()
-                backCallback.isEnabled = false
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-            } catch (_: HttpException) {
-                httpToast(requireContext())
+                val response = ApiClient.apiService.addItem(username, name, tags, image)
+                if (response.isSuccessful) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Успешно",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    backCallback.isEnabled = false
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                } else {
+                    httpToast(requireContext())
+                }
             } catch (_: IOException) {
                 ioToast(requireContext())
             }

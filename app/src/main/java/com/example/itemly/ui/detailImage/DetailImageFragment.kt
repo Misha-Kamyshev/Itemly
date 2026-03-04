@@ -153,15 +153,24 @@ class DetailImageFragment(
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 if (!isSelected) {
-                    ApiClient.apiService.addLike(ItemRequest(data.id, username))
-                    countLike.value = countLike.value!! + 1
+                    val response =
+                        ApiClient.apiService.addLike(ItemRequest(data.id, username))
+                    if (response.isSuccessful) {
+                        countLike.value = countLike.value!! + 1
+                        imageLike.isSelected = true
+                    } else {
+                        httpToast(context)
+                    }
                 } else {
-                    ApiClient.apiService.deleteLike(ItemRequest(data.id, username))
-                    countLike.value = countLike.value!! - 1
+                    val response =
+                        ApiClient.apiService.deleteLike(ItemRequest(data.id, username))
+                    if (response.isSuccessful) {
+                        countLike.value = countLike.value!! - 1
+                        imageLike.isSelected = false
+                    } else {
+                        httpToast(context)
+                    }
                 }
-                imageLike.isSelected = !isSelected
-            } catch (_: HttpException) {
-                httpToast(context)
             } catch (_: IOException) {
                 ioToast(context)
             }
@@ -175,10 +184,12 @@ class DetailImageFragment(
     private fun saveItem() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                ApiClient.apiService.saveItem(ItemRequest(data.id, username))
-                myImage.value = true
-            } catch (_: HttpException) {
-                httpToast(context)
+                val response = ApiClient.apiService.saveItem(ItemRequest(data.id, username))
+                if (response.isSuccessful) {
+                    myImage.value = true
+                } else {
+                    httpToast(context)
+                }
             } catch (_: IOException) {
                 ioToast(context)
             }
@@ -188,11 +199,14 @@ class DetailImageFragment(
     private fun deleteItem() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                ApiClient.apiService.deleteFavoriteItem(ItemRequest(data.id, username))
-                favoriteViewModel.removeItem(data.id)
-                myImage.value = false
-            } catch (_: HttpException) {
-                httpToast(context)
+                val response =
+                    ApiClient.apiService.deleteFavoriteItem(ItemRequest(data.id, username))
+                if (response.isSuccessful) {
+                    favoriteViewModel.removeItem(data.id)
+                    myImage.value = false
+                } else {
+                    httpToast(context)
+                }
             } catch (_: IOException) {
                 ioToast(context)
             }
