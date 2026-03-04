@@ -33,10 +33,10 @@ interface ApiService {
     @GET("items/get_information")
     suspend fun getInformation(@Query("id_item") id: Int): ItemInformation
 
-    @POST("item/add_like")
+    @POST("items/add_like")
     suspend fun addLike(@Body request: ItemRequest): Response<Unit>
 
-    @POST("item/delete_like")
+    @POST("items/delete_like")
     suspend fun deleteLike(@Body request: ItemRequest): Response<Unit>
 
     @Multipart
@@ -57,6 +57,6 @@ interface ApiService {
     @POST("/items/save_item")
     suspend fun saveItem(@Body request: ItemRequest): Response<Unit>
 
-    @POST("/item/delete_favorite_item")
+    @POST("/items/delete_favorite_item")
     suspend fun deleteFavoriteItem(@Body request: ItemRequest): Response<Unit>
 }
