@@ -231,31 +231,31 @@ class PreviewImageFragment : Fragment() {
     }
 
     private fun getTags(): String? {
-        val tagsBuilder = StringBuilder()
+        val tagsList = mutableListOf<String>()
 
         for (i in 0 until binding.tagsContainer.childCount) {
             val row = binding.tagsContainer.getChildAt(i) as LinearLayout
             val textInputLayout = row.getChildAt(0) as TextInputLayout
             val editText = textInputLayout.editText
-            val tagText = editText?.text?.toString()?.replace(" ", "")?.trimStart('#')
+            val tagText = editText?.text?.toString()
+                ?.replace(" ", "")
+                ?.trimStart('#')
 
             if (!tagText.isNullOrEmpty()) {
-                tagsBuilder.append(tagText).append(";")
+                tagsList.add(tagText)
             }
         }
 
-        if (tagsBuilder.isEmpty()) {
+        if (tagsList.isEmpty()) {
             AlertDialog.Builder(requireContext())
                 .setTitle("Ошибка")
                 .setMessage("Добавьте хотя бы один тэг")
-                .setPositiveButton("Ок") { dialog, _ ->
-                    dialog.dismiss()
-                }
+                .setPositiveButton("Ок") { dialog, _ -> dialog.dismiss() }
                 .show()
             return null
         }
 
-        return tagsBuilder.toString()
+        return tagsList.joinToString(";")
     }
 
     private fun getImage(): Bitmap? {
