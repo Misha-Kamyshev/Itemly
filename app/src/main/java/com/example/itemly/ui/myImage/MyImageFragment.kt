@@ -1,6 +1,5 @@
 package com.example.itemly.ui.myImage
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,15 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentMyImageBinding
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.detailImage.DetailImageFragment
 import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.ui.viewModel.MyImageViewModel
 import com.example.itemly.utils.StaggeredGridSpacingItemDecoration
+import com.example.itemly.utils.subscribeDataForAdapter
 
 class MyImageFragment : Fragment() {
     private var _binding: FragmentMyImageBinding? = null
@@ -59,33 +57,13 @@ class MyImageFragment : Fragment() {
             )
         }
 
-        subscribeDataForAdapter(adapter, layout)
-    }
-
-    private fun subscribeDataForAdapter(
-        adapter: AdapterImageView,
-        layout: StaggeredGridLayoutManager
-    ) {
-        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-        val username = pref.getString(PrefKeys.USERNAME, "")!!
-
-        binding.recyclerFragmentMyImage.addOnScrollListener(object :
-            RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val totalItemCount = layout.itemCount
-                val lastVisibleItems = layout.findLastVisibleItemPositions(null)
-                val lastVisibleItem = lastVisibleItems.maxOrNull() ?: 0
-
-                if (lastVisibleItem + 5 >= totalItemCount) {
-                    viewModel.loadNextPage(username, requireContext())
-                }
-            }
-        })
-
-        viewModel.items.observe(viewLifecycleOwner) { items ->
-            adapter.submitList(items.toMutableList())
-        }
-        viewModel.loadFirstPage(username, requireContext())
+        subscribeDataForAdapter(
+            requireContext(),
+            binding.recyclerFragmentMyImage,
+            adapter,
+            layout,
+            viewLifecycleOwner,
+            viewModel
+        )
     }
 }

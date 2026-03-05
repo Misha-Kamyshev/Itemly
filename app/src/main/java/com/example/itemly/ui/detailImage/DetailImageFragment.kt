@@ -24,7 +24,9 @@ import com.example.itemly.ui.components.httpToast
 import com.example.itemly.ui.components.ioToast
 import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.ui.viewModel.FavoriteViewModel
+import com.example.itemly.ui.viewModel.DetailImageViewModel
 import com.example.itemly.utils.StaggeredGridSpacingItemDecoration
+import com.example.itemly.utils.subscribeDataForAdapter
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -39,6 +41,7 @@ class DetailImageFragment(
     private var _binding: FragmentDetailImageBinding? = null
     private val binding get() = _binding!!
     private val favoriteViewModel: FavoriteViewModel by activityViewModels()
+    private val viewModel: DetailImageViewModel by activityViewModels()
     private lateinit var username: String
     private val countLike = MutableLiveData(0)
     private val countComment = MutableLiveData(0)
@@ -107,7 +110,7 @@ class DetailImageFragment(
     }
 
     private fun setupAdapters() {
-        val adapter = AdapterTagsDetailImageFragment {} // TODO
+        val adapter = AdapterTagsDetailImageFragment {} // TODO нажатие на тэг
         binding.includeBlockTagsDetailImageFragment.tagsRecyclerDetailImage.apply {
             this.adapter = adapter
             this.layoutManager = FlexboxLayoutManager(requireContext()).apply {
@@ -134,6 +137,15 @@ class DetailImageFragment(
             this.layoutManager = layout
             this.addItemDecoration(StaggeredGridSpacingItemDecoration(2, 10, true))
         }
+
+        subscribeDataForAdapter(
+            requireContext(),
+            binding.recyclerFragmentDetailImage,
+            adapterImage,
+            layout,
+            viewLifecycleOwner,
+            viewModel
+        )
     }
 
     private fun getInformation(adapter: AdapterTagsDetailImageFragment) {
