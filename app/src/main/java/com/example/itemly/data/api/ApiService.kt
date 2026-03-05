@@ -24,6 +24,9 @@ interface ApiService {
     @POST("user/signup")
     suspend fun signUp(@Body request: DataRegistrationPush): DataAuthorizationPull
 
+    @POST("user/get_image_user")
+    suspend fun getImageUser(@Body username: String): String // TODO Сделать эндпоинт
+
     @POST("user/update_token")
     suspend fun updateToken(@Body refreshToken: String): DataAuthorizationPull
 
@@ -53,6 +56,9 @@ interface ApiService {
 
     @POST("items/get_my_image")
     suspend fun getMyImage(@Body request: ItemsRequest): ItemsData
+
+    @POST("items/get_like")
+    suspend fun getLike(@Body request: ItemsRequest): ItemsData
 
     @POST("items/save_item")
     suspend fun saveItem(@Body request: ItemRequest): Response<Unit>
