@@ -37,13 +37,8 @@ class MyImageFragment : Fragment() {
     }
 
     private fun setupRecycler() {
-        val adapter = AdapterImageView(mutableListOf()) { item ->
-            (activity as? MainActivity)?.openDetailFragment(
-                DetailImageFragment(
-                    item,
-                    MutableLiveData(false)
-                )
-            )
+        val adapter = AdapterImageView(mutableListOf()) { data ->
+            (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(data))
         }
 
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)

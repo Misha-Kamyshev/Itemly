@@ -44,14 +44,9 @@ class HomeFragment : Fragment() {
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
-        val adapter = AdapterImageView(mutableListOf()) { item ->
+        val adapter = AdapterImageView(mutableListOf()) { data ->
             if (!binding.editSearch.hasFocus())
-                (activity as? MainActivity)?.openDetailFragment(
-                    DetailImageFragment(
-                        item,
-                        MutableLiveData(false)
-                    )
-                )
+                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(data))
         }
 
         binding.recyclerFragmentHome.apply {

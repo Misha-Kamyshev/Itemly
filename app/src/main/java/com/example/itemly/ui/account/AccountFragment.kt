@@ -83,12 +83,7 @@ class AccountFragment : Fragment() {
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
         val adapter = AdapterImageView(mutableListOf()) { item ->
-            (activity as? MainActivity)?.openDetailFragment(
-                DetailImageFragment(
-                    item,
-                    MutableLiveData(false)
-                )
-            )
+            (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(item))
         }
 
         binding.recyclerItems.apply {

@@ -35,5 +35,7 @@ data class ItemInformation(
     @SerializedName("count_like")
     val countLike: Int = 0,
     @SerializedName("count_comment")
-    val countComment: Int = 0
+    val countComment: Int = 0,
+    @SerializedName("save_item")
+    val saveItem: Boolean
 )

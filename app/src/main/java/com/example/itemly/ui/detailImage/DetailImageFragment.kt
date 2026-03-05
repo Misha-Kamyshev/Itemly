@@ -34,10 +34,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-class DetailImageFragment(
-    private val data: ItemDataSchema,
-    private val myImage: MutableLiveData<Boolean>
-) : Fragment() {
+class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
     private var _binding: FragmentDetailImageBinding? = null
     private val binding get() = _binding!!
     private val favoriteViewModel: FavoriteViewModel by activityViewModels()
@@ -45,6 +42,7 @@ class DetailImageFragment(
     private lateinit var username: String
     private val countLike = MutableLiveData(0)
     private val countComment = MutableLiveData(0)
+    private val myImage = MutableLiveData(false)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -123,13 +121,8 @@ class DetailImageFragment(
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
-        val adapterImage = AdapterImageView(mutableListOf()) { item ->
-            (activity as? MainActivity)?.openDetailFragment(
-                DetailImageFragment(
-                    item,
-                    MutableLiveData(false)
-                )
-            )
+        val adapterImage = AdapterImageView(mutableListOf()) { data ->
+            (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(data))
         }
 
         binding.recyclerFragmentDetailImage.apply {
@@ -158,6 +151,7 @@ class DetailImageFragment(
                     countComment.text = response.countComment.toString()
                     usernameAuthor.text = response.author
                     nameItem.text = response.name
+                    myImage.value = response.saveItem
 
                     Glide.with(requireContext())
                         .load(ApiConstants.BASE_URL + response.iconAuthor)
