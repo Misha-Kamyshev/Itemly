@@ -38,7 +38,6 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
     private var _binding: FragmentDetailImageBinding? = null
     private val binding get() = _binding!!
     private val favoriteViewModel: FavoriteViewModel by activityViewModels()
-    private val viewModel: DetailImageViewModel by activityViewModels()
     private lateinit var username: String
     private val countLike = MutableLiveData(0)
     private val countComment = MutableLiveData(0)
@@ -116,7 +115,7 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
                 flexWrap = FlexWrap.WRAP
             }
         }
-        getInformation(adapter)
+        val tags = getInformation(adapter)
 
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
@@ -131,6 +130,8 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
             this.addItemDecoration(StaggeredGridSpacingItemDecoration(2, 10, true))
         }
 
+        val viewModel = DetailImageViewModel(tags)
+
         subscribeDataForAdapter(
             requireContext(),
             binding.recyclerFragmentDetailImage,
@@ -141,7 +142,8 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
         )
     }
 
-    private fun getInformation(adapter: AdapterTagsDetailImageFragment) {
+    private fun getInformation(adapter: AdapterTagsDetailImageFragment): List<String> {
+        var tags: List<String> = emptyList()
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val response = ApiClient.apiService.getInformation(data.id)
@@ -157,6 +159,8 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
                         .load(ApiConstants.BASE_URL + response.iconAuthor)
                         .into(imageUserPushDetailImage)
                 }
+
+                tags = response.tags
             } catch (_: HttpException) {
                 httpToast(context)
                 requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -165,6 +169,8 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
                 requireActivity().onBackPressedDispatcher.onBackPressed()
             }
         }
+        return tags
+
     }
 
     private fun onClickLike() {

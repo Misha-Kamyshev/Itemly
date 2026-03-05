@@ -39,3 +39,10 @@ data class ItemInformation(
     @SerializedName("save_item")
     val saveItem: Boolean
 )
+
+data class ItemSimilarRequest(
+    val username: String,
+    val tags: List<String>,
+    @SerializedName("last_id")
+    val lastId: Int? = null
+)

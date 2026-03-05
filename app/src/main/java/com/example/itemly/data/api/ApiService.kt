@@ -5,6 +5,7 @@ import com.example.itemly.data.model.authorization.DataAuthorizationPush
 import com.example.itemly.data.model.authorization.DataRegistrationPush
 import com.example.itemly.data.model.item.ItemInformation
 import com.example.itemly.data.model.item.ItemRequest
+import com.example.itemly.data.model.item.ItemSimilarRequest
 import com.example.itemly.data.model.item.ItemsData
 import com.example.itemly.data.model.item.ItemsRequest
 import okhttp3.MultipartBody
@@ -65,4 +66,7 @@ interface ApiService {
 
     @POST("items/delete_favorite_item")
     suspend fun deleteFavoriteItem(@Body request: ItemRequest): Response<Unit>
+
+    @POST("items/get_similar_images")
+    suspend fun getSimilar(@Body request: ItemSimilarRequest): ItemsData
 }
