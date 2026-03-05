@@ -22,7 +22,9 @@ import com.example.itemly.databinding.FragmentDetailImageBinding
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.components.httpToast
 import com.example.itemly.ui.components.ioToast
+import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.ui.viewModel.FavoriteViewModel
+import com.example.itemly.utils.StaggeredGridSpacingItemDecoration
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -115,9 +117,22 @@ class DetailImageFragment(
         }
         getInformation(adapter)
 
+        val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+
+        val adapterImage = AdapterImageView(mutableListOf()) { item ->
+            (activity as? MainActivity)?.openDetailFragment(
+                DetailImageFragment(
+                    item,
+                    MutableLiveData(false)
+                )
+            )
+        }
+
         binding.recyclerFragmentDetailImage.apply {
-            this.adapter = AdapterImageView(mutableListOf()) {}
-            this.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            this.adapter = adapterImage
+            this.layoutManager = layout
+            this.addItemDecoration(StaggeredGridSpacingItemDecoration(2, 10, true))
         }
     }
 
