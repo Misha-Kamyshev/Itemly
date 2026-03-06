@@ -32,8 +32,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
-import retrofit2.HttpException
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 

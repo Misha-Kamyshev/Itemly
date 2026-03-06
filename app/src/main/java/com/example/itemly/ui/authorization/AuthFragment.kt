@@ -18,7 +18,6 @@ import com.example.itemly.utils.buildColoredSpannable
 import com.example.itemly.utils.nextFocus
 import com.example.itemly.utils.saveToken
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.io.IOException
 
 class AuthFragment : Fragment() {

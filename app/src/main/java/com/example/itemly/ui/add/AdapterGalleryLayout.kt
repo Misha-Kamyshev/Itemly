@@ -1,6 +1,5 @@
 package com.example.itemly.ui.add
 
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View

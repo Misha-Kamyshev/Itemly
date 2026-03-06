@@ -17,7 +17,6 @@ import com.example.itemly.utils.buildColoredSpannable
 import com.example.itemly.utils.nextFocus
 import com.example.itemly.utils.saveToken
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
 

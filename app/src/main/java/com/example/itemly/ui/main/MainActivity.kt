@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.ActivityMainBinding
 import com.example.itemly.ui.add.AddFragment

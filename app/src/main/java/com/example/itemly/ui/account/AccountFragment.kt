@@ -5,17 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.bumptech.glide.Glide
-import com.example.itemly.R
 import com.example.itemly.data.api.ApiClient
-import com.example.itemly.data.api.ApiConstants
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentAccountBinding
 import com.example.itemly.ui.components.httpToast
@@ -87,7 +82,6 @@ class AccountFragment : Fragment() {
         )
 
         val concatAdapter = ConcatAdapter(headerAdapter, adapterItem)
-
 
         binding.recyclerAccount.apply {
             this.adapter = concatAdapter
