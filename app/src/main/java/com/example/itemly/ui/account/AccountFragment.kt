@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.itemly.R
@@ -33,6 +34,8 @@ class AccountFragment : Fragment() {
     private var _binding: FragmentAccountBinding? = null
     private val binding get() = _binding!!
     private val viewModel: AccountViewModel by activityViewModels()
+    private lateinit var username: String
+    private lateinit var email: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,25 +48,20 @@ class AccountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val pref = requireActivity().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
+        username = pref.getString(PrefKeys.USERNAME, "")!!
+        email = pref.getString(PrefKeys.E_MAIL, "")!!
 
-        setupUserData()
         setupAdapter()
     }
 
-    private fun setupUserData() {
-        val pref = requireActivity().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-        val username = pref.getString(PrefKeys.USERNAME, "")!!
-        val email = pref.getString(PrefKeys.E_MAIL, "")!!
+    private fun getIconAccount(): String? {
+        var iconAccountUrl: String? = null
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val response = ApiClient.apiService.getImageUser(username)
-                Glide.with(binding.imageAccount.context)
-                    .load(ApiConstants.BASE_URL + response)
-                    .placeholder(R.drawable.ic_account)
-                    .error(R.drawable.ic_account)
-                    .fallback(R.drawable.ic_account)
-                    .into(binding.imageAccount)
+                iconAccountUrl = response.pathPreview
             } catch (_: HttpException) {
                 httpToast(requireContext())
             } catch (_: IOException) {
@@ -71,31 +69,36 @@ class AccountFragment : Fragment() {
             }
         }
 
-        binding.usernameAccount.text = username
-        binding.emailAccount.text = email
-        binding.imageAccount.setColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.black)
-        )
+        return iconAccountUrl
     }
 
     private fun setupAdapter() {
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
-        val adapter = AdapterImageView(mutableListOf()) { item ->
+        val adapterItem = AdapterImageView(mutableListOf()) { item ->
             (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(item))
         }
 
-        binding.recyclerItems.apply {
-            this.adapter = adapter
+        val headerAdapter = HeaderAdapter(
+            username = username,
+            email = email,
+            iconAccountUrl = getIconAccount()
+        )
+
+        val concatAdapter = ConcatAdapter(headerAdapter, adapterItem)
+
+
+        binding.recyclerAccount.apply {
+            this.adapter = concatAdapter
             this.layoutManager = layout
             this.addItemDecoration(StaggeredGridSpacingItemDecoration(2, 10, true))
         }
 
         subscribeDataForAdapter(
             requireContext(),
-            binding.recyclerItems,
-            adapter,
+            binding.recyclerAccount,
+            adapterItem,
             layout,
             viewLifecycleOwner,
             viewModel
