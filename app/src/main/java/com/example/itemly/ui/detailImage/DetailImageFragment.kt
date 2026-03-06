@@ -146,7 +146,7 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
         var tags: List<String> = emptyList()
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val response = ApiClient.apiService.getInformation(data.id)
+                val response = ApiClient.apiService.getInformation(data.id, username)
                 adapter.submitData(response.tags)
                 binding.includeBlockTagsDetailImageFragment.apply {
                     countLike.text = response.countLike.toString()
@@ -155,9 +155,15 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
                     nameItem.text = response.name
                     myImage.value = response.saveItem
 
-                    Glide.with(requireContext())
-                        .load(ApiConstants.BASE_URL + response.iconAuthor)
-                        .into(imageUserPushDetailImage)
+                    if (response.iconAuthor.isNullOrEmpty()) {
+                        binding.includeBlockTagsDetailImageFragment.imageUserPushDetailImage.setImageResource(R.drawable.ic_account)
+                    } else {
+                        Glide.with(binding.includeBlockTagsDetailImageFragment.imageUserPushDetailImage.context)
+                            .load(ApiConstants.BASE_URL + response.iconAuthor)
+                            .placeholder(R.drawable.ic_account)
+                            .error(R.drawable.ic_account)
+                            .into(binding.includeBlockTagsDetailImageFragment.imageUserPushDetailImage)
+                    }
                 }
 
                 tags = response.tags
@@ -205,7 +211,7 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
     }
 
     private fun onClickComment() {
-        // TODO
+        // TODO Сделать логику открытия комментариев
     }
 
     private fun saveItem() {

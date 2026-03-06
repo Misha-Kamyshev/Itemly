@@ -8,6 +8,7 @@ import com.example.itemly.data.model.item.ItemRequest
 import com.example.itemly.data.model.item.ItemSimilarRequest
 import com.example.itemly.data.model.item.ItemsData
 import com.example.itemly.data.model.item.ItemsRequest
+import com.example.itemly.data.model.user.DataPreviewImageResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -26,7 +27,7 @@ interface ApiService {
     suspend fun signUp(@Body request: DataRegistrationPush): DataAuthorizationPull
 
     @POST("user/get_image_user")
-    suspend fun getImageUser(@Body username: String): String // TODO Сделать эндпоинт
+    suspend fun getImageUser(@Query("username") username: String): DataPreviewImageResponse
 
     @POST("user/update_token")
     suspend fun updateToken(@Body refreshToken: String): DataAuthorizationPull
@@ -35,7 +36,10 @@ interface ApiService {
     suspend fun getMain(@Body request: ItemsRequest): ItemsData
 
     @GET("items/get_information")
-    suspend fun getInformation(@Query("id_item") id: Int): ItemInformation
+    suspend fun getInformation(
+        @Query("id_item") id: Int,
+        @Query("username") username: String
+    ): ItemInformation
 
     @POST("items/add_like")
     suspend fun addLike(@Body request: ItemRequest): Response<Unit>
@@ -68,5 +72,7 @@ interface ApiService {
     suspend fun deleteFavoriteItem(@Body request: ItemRequest): Response<Unit>
 
     @POST("items/get_similar_images")
-    suspend fun getSimilar(@Body request: ItemSimilarRequest): ItemsData
+    suspend fun getSimilar(@Body request: ItemSimilarRequest): ItemsData 
 }
+
+// TODO сделать в детаил стандартную аватарку и если null не кидать запрос
