@@ -68,7 +68,8 @@
                     android:id="@+id/imageUserPushDetailImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:contentDescription="@string/detail_user_image" />
+                    android:contentDescription="@string/detail_user_image"
+                    android:tint="@color/black" />
 
             </com.google.android.material.card.MaterialCardView>
 
