@@ -72,7 +72,10 @@ interface ApiService {
     suspend fun deleteFavoriteItem(@Body request: ItemRequest): Response<Unit>
 
     @POST("items/get_similar_images")
-    suspend fun getSimilar(@Body request: ItemSimilarRequest): ItemsData 
+    suspend fun getSimilar(@Body request: ItemSimilarRequest): ItemsData
+
+    @POST("items/get_items_author")
+    suspend fun getItemsAuthor(@Body request: ItemsRequest): ItemsData
 }
 
 // TODO сделать в детаил стандартную аватарку и если null не кидать запрос

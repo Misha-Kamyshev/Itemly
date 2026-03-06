@@ -9,17 +9,20 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.itemly.R
 import com.example.itemly.data.api.ApiConstants
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textview.MaterialTextView
 
 class HeaderAdapter(
     private val username: String,
-    private val email: String,
-    private val iconAccountUrl: String?
+    private val email: String?,
+    private val iconAccountUrl: String?,
+    private val userAuthor: Boolean
 ) : RecyclerView.Adapter<HeaderAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val username: MaterialTextView = view.findViewById(R.id.usernameAccount)
         val email: MaterialTextView = view.findViewById(R.id.emailAccount)
         val icon: ImageView = view.findViewById(R.id.imageAccount)
+        val buttonSetting: MaterialCardView = view.findViewById(R.id.buttonSettingsAccount)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -31,7 +34,11 @@ class HeaderAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.username.text = username
-        holder.email.text = email
+        if (email.isNullOrEmpty()) {
+            holder.email.visibility = View.GONE
+        } else {
+            holder.email.text = email
+        }
 
         if (iconAccountUrl.isNullOrEmpty()) {
             holder.icon.setImageResource(R.drawable.ic_account)
@@ -41,6 +48,12 @@ class HeaderAdapter(
                 .placeholder(R.drawable.ic_account)
                 .error(R.drawable.ic_account)
                 .into(holder.icon)
+        }
+
+        if (userAuthor) {
+            holder.buttonSetting.visibility = View.GONE
+        } else {
+            holder.buttonSetting.visibility = View.VISIBLE
         }
     }
 

@@ -15,6 +15,7 @@ import com.example.itemly.data.model.item.ItemDataSchema
 import com.example.itemly.data.model.item.ItemInformation
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentDetailImageBinding
+import com.example.itemly.ui.accountAuthor.AccountAuthor
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.components.httpToast
 import com.example.itemly.ui.components.ioToast
@@ -66,6 +67,11 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
                 viewLifecycleOwner,
                 favoriteViewModel,
                 onClickBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
+                onClickAuthor = {
+                    (activity as? MainActivity)?.openDetailFragment(
+                        AccountAuthor(info.author)
+                    )
+                }
             )
 
             val adapterImage = AdapterImageView(mutableListOf()) { data ->

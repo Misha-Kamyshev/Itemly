@@ -33,7 +33,8 @@ class AdapterDetail(
     private val info: ItemInformation,
     private val lifecycleOwner: LifecycleOwner,
     private val favoriteViewModel: FavoriteViewModel,
-    private val onClickBack: () -> Unit
+    private val onClickBack: () -> Unit,
+    private val onClickAuthor: () -> Unit
 ) : RecyclerView.Adapter<AdapterDetail.ViewHolder>() {
     private val saveItem = MutableLiveData(false)
     private val countLike = MutableLiveData(0)
@@ -65,12 +66,6 @@ class AdapterDetail(
             onClickBack()
         }
 
-        binding.includeBlockTagsDetailImageFragment.apply {
-            imageLike.setOnClickListener {
-                onClickLike(imageLike)
-            }
-        }
-
         val adapterTags = AdapterTagsDetailImageFragment {}
 
         binding.includeBlockTagsDetailImageFragment.tagsRecyclerDetailImage.apply {
@@ -82,6 +77,11 @@ class AdapterDetail(
         }
 
         loadInformation(binding, adapterTags)
+        binding.includeBlockTagsDetailImageFragment.apply {
+            imageLike.setOnClickListener { onClickLike(imageLike) }
+            blockAuthor.setOnClickListener { onClickAuthor() }
+            buttonGoToAuthor.setOnClickListener { onClickAuthor() }
+        }
     }
 
     override fun getItemCount() = 1
