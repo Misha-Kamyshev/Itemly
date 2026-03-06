@@ -25,7 +25,7 @@
                 android:layout_height="30dp"
                 android:layout_marginEnd="5dp"
                 android:contentDescription="@string/ic_like"
-                android:src="@drawable/ic_heart"
+                android:src="@drawable/like_selector"
                 app:tint="@color/black" />
 
             <com.google.android.material.textview.MaterialTextView

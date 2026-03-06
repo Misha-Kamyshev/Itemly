@@ -148,12 +148,15 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
             try {
                 val response = ApiClient.apiService.getInformation(data.id, username)
                 adapter.submitData(response.tags)
+                countLike.value = response.countLike
+                countComment.value = response.countComment
+
                 binding.includeBlockTagsDetailImageFragment.apply {
-                    countLike.text = response.countLike.toString()
-                    countComment.text = response.countComment.toString()
                     usernameAuthor.text = response.author
                     nameItem.text = response.name
                     myImage.value = response.saveItem
+                    imageLike.isSelected = response.likeItem
+
 
                     if (response.iconAuthor.isNullOrEmpty()) {
                         binding.includeBlockTagsDetailImageFragment.imageUserPushDetailImage.setImageResource(R.drawable.ic_account)
