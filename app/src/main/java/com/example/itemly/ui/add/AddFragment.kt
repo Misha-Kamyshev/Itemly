@@ -108,13 +108,6 @@ class AddFragment : Fragment() {
         binding.galleryLayoutAddPhotoFragment.visibility = View.VISIBLE
         binding.noAccessLayoutAddPhotoFragment.visibility = View.GONE
 
-        binding.root.setBackgroundColor(
-            ContextCompat.getColor(
-                requireContext(),
-                android.R.color.white
-            )
-        )
-
         val spacing = resources.getDimensionPixelSize(R.dimen.spacing_image_gallery)
 
         binding.recyclerLayoutAddPhotoFragment.apply {

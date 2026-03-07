@@ -78,4 +78,3 @@ interface ApiService {
     suspend fun getItemsAuthor(@Body request: ItemsRequest): ItemsData
 }
 
-// TODO сделать в детаил стандартную аватарку и если null не кидать запрос
