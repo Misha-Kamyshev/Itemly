@@ -1,6 +1,7 @@
 package com.example.itemly.ui.detailImage
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,11 +30,34 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
+class DetailImageFragment : Fragment() {
+    private lateinit var data: ItemDataSchema
     private var _binding: FragmentDetailImageBinding? = null
     private val binding get() = _binding!!
     private val favoriteViewModel: FavoriteViewModel by activityViewModels()
     private lateinit var username: String
+
+    companion object {
+        private const val ARG_ITEM = "arg_item"
+
+        fun newInstance(data: ItemDataSchema): DetailImageFragment {
+            return DetailImageFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(ARG_ITEM, data)
+                }
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requireArguments().getSerializable(ARG_ITEM, ItemDataSchema::class.java)!!
+        } else {
+            @Suppress("DEPRECATION")
+            requireArguments().getSerializable(ARG_ITEM) as ItemDataSchema
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,7 +99,7 @@ class DetailImageFragment(private val data: ItemDataSchema) : Fragment() {
             )
 
             val adapterImage = AdapterImageView(mutableListOf()) { data ->
-                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(data))
+                (activity as? MainActivity)?.openDetailFragment(newInstance(data))
             }
 
             val concatAdapter = ConcatAdapter(headerAdapter, adapterImage)

@@ -45,7 +45,7 @@ class HomeFragment : Fragment() {
 
         val adapter = AdapterImageView(mutableListOf()) { data ->
             if (!binding.editSearch.hasFocus())
-                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(data))
+                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(data))
         }
 
         binding.recyclerFragmentHome.apply {

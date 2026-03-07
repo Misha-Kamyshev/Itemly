@@ -1,13 +1,13 @@
 package com.example.itemly.data.model.item
 
 import com.google.gson.annotations.SerializedName
-
+import java.io.Serializable
 
 data class ItemDataSchema(
     val id: Int,
     @SerializedName("image_url")
     val imageUrl: String
-)
+): Serializable
 
 data class ItemsData(
     val items: List<ItemDataSchema>,

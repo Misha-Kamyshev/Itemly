@@ -37,7 +37,7 @@ class FavoriteFragment : Fragment() {
 
     private fun setupRecycler() {
         val adapter = AdapterImageView(mutableListOf()) { data ->
-            (activity as? MainActivity)?.openDetailFragment(DetailImageFragment(data))
+            (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(data))
         }
 
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)

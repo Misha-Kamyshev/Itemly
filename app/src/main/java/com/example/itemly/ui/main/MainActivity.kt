@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,13 +18,13 @@ import com.example.itemly.ui.account.AccountFragment
 import com.example.itemly.ui.authorization.AuthFragment
 import com.example.itemly.ui.home.HomeFragment
 import com.example.itemly.ui.main.components.BottomBarView.Item
+import com.example.itemly.ui.viewModel.NavigationViewModel
 import com.example.itemly.utils.logout
 
 class MainActivity : AppCompatActivity() {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
-    private val mainStack = mutableListOf<String>()
-    private val detailStack = mutableListOf<Fragment>()
+    private val navigateViewModel: NavigationViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +35,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupBottomBar()
-        loadingApplication()
+
+        if (savedInstanceState == null) {
+            loadingApplication()
+        } else {
+            restoreStacks()
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
 
@@ -73,6 +79,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun restoreStacks() {
+        val fragments = supportFragmentManager.fragments
+
+        navigateViewModel.mainStack.clear()
+        navigateViewModel.detailStack.clear()
+
+        fragments.forEach { fragment ->
+            val tag = fragment.tag ?: return@forEach
+            when {
+                tag.startsWith("DETAIL_") || tag == "ADD_FRAGMENT" -> {
+                    navigateViewModel.detailStack.add(fragment)
+                }
+
+                tag in listOf("HOME", "FAVORITE", "ACCOUNT", "MY_IMAGE") -> {
+                    navigateViewModel.mainStack.add(tag)
+                }
+            }
+        }
+        val transaction = supportFragmentManager.beginTransaction()
+
+        fragments.forEach {
+            if (!it.isHidden) transaction.hide(it)
+        }
+
+        val topFragment =
+            navigateViewModel.detailStack.lastOrNull()
+                ?: navigateViewModel.mainStack.lastOrNull()?.let {
+                    supportFragmentManager.findFragmentByTag(it)
+                }
+
+        topFragment?.let {
+            transaction.show(it)
+        }
+
+        transaction.commitNow()
+
+        binding.bottomBar.visibility =
+            if (navigateViewModel.detailStack.isEmpty()) View.VISIBLE else View.GONE
+    }
+
     // Настройка BottomBar
     private fun setupBottomBar() {
         binding.bottomBar.onClickListener = { item ->
@@ -95,24 +141,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleBack(): Boolean {
-        if (detailStack.isNotEmpty()) {
-            val fragment = detailStack.removeAt(detailStack.lastIndex)
+        if (navigateViewModel.detailStack.isNotEmpty()) {
+            val fragment =
+                navigateViewModel.detailStack.removeAt(navigateViewModel.detailStack.lastIndex)
             supportFragmentManager.beginTransaction().remove(fragment).commitNow()
 
-            val prev = detailStack.lastOrNull() ?: supportFragmentManager.findFragmentByTag(
-                mainStack.last()
-            )
+            val prev = navigateViewModel.detailStack.lastOrNull()
+                ?: supportFragmentManager.findFragmentByTag(
+                    navigateViewModel.mainStack.last()
+                )
             prev?.let { supportFragmentManager.beginTransaction().show(it).commitNow() }
 
-            binding.bottomBar.visibility = if (detailStack.isEmpty()) View.VISIBLE else View.GONE
+            binding.bottomBar.visibility =
+                if (navigateViewModel.detailStack.isEmpty()) View.VISIBLE else View.GONE
 
-            if (detailStack.isEmpty()) syncBottomBarSelection(mainStack.lastOrNull())
+            if (navigateViewModel.detailStack.isEmpty()) syncBottomBarSelection(navigateViewModel.mainStack.lastOrNull())
             return true
         }
 
-        if (mainStack.size > 1) {
-            val current = mainStack.removeAt(mainStack.lastIndex)
-            val prevTag = mainStack.last()
+        if (navigateViewModel.mainStack.size > 1) {
+            val current =
+                navigateViewModel.mainStack.removeAt(navigateViewModel.mainStack.lastIndex)
+            val prevTag = navigateViewModel.mainStack.last()
             val transaction = supportFragmentManager.beginTransaction()
             supportFragmentManager.findFragmentByTag(current)?.let { transaction.hide(it) }
             supportFragmentManager.findFragmentByTag(prevTag)?.let { transaction.show(it) }
@@ -126,16 +176,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun clearBackStack(clearMain: Boolean) {
-        if (detailStack.isEmpty()) return
+        if (navigateViewModel.detailStack.isEmpty()) return
 
         val transaction = supportFragmentManager.beginTransaction()
 
-        detailStack.forEach { fragment ->
+        navigateViewModel.detailStack.forEach { fragment ->
             transaction.remove(fragment)
         }
 
         if (clearMain) {
-            mainStack.forEach { tag ->
+            navigateViewModel.mainStack.forEach { tag ->
                 supportFragmentManager.findFragmentByTag(tag)?.let {
                     transaction.remove(it)
                 }
@@ -144,15 +194,15 @@ class MainActivity : AppCompatActivity() {
 
         transaction.commitNow()
 
-        detailStack.clear()
+        navigateViewModel.detailStack.clear()
         if (clearMain) {
-            mainStack.clear()
+            navigateViewModel.mainStack.clear()
         }
 
         binding.bottomBar.visibility = View.VISIBLE
     }
 
-    private fun syncBottomBarSelection(tag: String? = mainStack.lastOrNull()) {
+    private fun syncBottomBarSelection(tag: String? = navigateViewModel.mainStack.lastOrNull()) {
         when (tag) {
             "HOME" -> binding.bottomBar.select(Item.HOME)
             "FAVORITE" -> binding.bottomBar.select(Item.FAVORITE)
@@ -167,7 +217,7 @@ class MainActivity : AppCompatActivity() {
 
         val transaction = supportFragmentManager.beginTransaction()
 
-        mainStack.lastOrNull()?.let { currentTag ->
+        navigateViewModel.mainStack.lastOrNull()?.let { currentTag ->
             supportFragmentManager.findFragmentByTag(currentTag)?.let { transaction.hide(it) }
         }
 
@@ -180,8 +230,8 @@ class MainActivity : AppCompatActivity() {
 
         transaction.commitNow()
 
-        mainStack.remove(tag)
-        mainStack.add(tag)
+        navigateViewModel.mainStack.remove(tag)
+        navigateViewModel.mainStack.add(tag)
 
         syncBottomBarSelection(tag)
     }
@@ -192,10 +242,14 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.fragments
             .firstOrNull { it.isVisible }?.let { transaction.hide(it) }
 
-        transaction.add(binding.containerFragment.id, detailFragment, "DETAIL_${detailStack.size}")
+        transaction.add(
+            binding.containerFragment.id,
+            detailFragment,
+            "DETAIL_${navigateViewModel.detailStack.size}"
+        )
             .commitNow()
 
-        detailStack.add(detailFragment)
+        navigateViewModel.detailStack.add(detailFragment)
     }
 
     private fun openAddFragment() {
@@ -205,7 +259,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.fragments.firstOrNull { it.isVisible }?.let { transaction.hide(it) }
 
         transaction.add(binding.containerFragment.id, addFragment, "ADD_FRAGMENT").commit()
-        detailStack.add(addFragment)
+        navigateViewModel.detailStack.add(addFragment)
 
         binding.bottomBar.visibility = View.GONE
     }
