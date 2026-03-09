@@ -1,21 +1,33 @@
 package com.example.itemly.ui.detailImage
 
+import android.content.ContentValues
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.itemly.R
 import com.example.itemly.data.api.ApiClient
+import com.example.itemly.data.api.ApiConstants
 import com.example.itemly.data.model.item.ItemDataSchema
 import com.example.itemly.data.model.item.ItemInformation
+import com.example.itemly.data.model.item.ItemRequest
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentDetailImageBinding
 import com.example.itemly.ui.accountAuthor.AccountAuthor
@@ -152,10 +164,16 @@ class DetailImageFragment : Fragment() {
         popupMenu.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.action_delete -> {
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Вы уверены?")
+                        .setMessage("Вы точно хотите удалить изображение для всех?")
+                        .setPositiveButton("Да") { dialog, _ -> dialog.dismiss(); onDeleteItem() }
+                        .setNeutralButton("Нет", null)
                     true
                 }
 
                 R.id.action_download -> {
+                    downloadImage()
                     true
                 }
 
@@ -163,5 +181,86 @@ class DetailImageFragment : Fragment() {
             }
         }
         popupMenu.show()
+    }
+
+    private fun onDeleteItem() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val response = ApiClient.apiService.deleteItem(ItemRequest(data.id, username))
+                if (response.isSuccessful) {
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                } else {
+                    httpToast(context)
+                }
+            } catch (_: IOException) {
+                ioToast(context)
+            }
+        }
+    }
+
+    private fun downloadImage() {
+        Glide.with(requireContext())
+            .asBitmap()
+            .load(ApiConstants.BASE_URL + data.imageUrl)
+            .listener(object : RequestListener<Bitmap> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Bitmap>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    val cause = e?.rootCauses?.firstOrNull()
+                    when (cause) {
+                        is IOException -> {
+                            ioToast(requireContext())
+                        }
+
+                        else -> {
+                            httpToast(requireContext())
+                        }
+                    }
+                    return true
+                }
+
+                override fun onResourceReady(
+                    resource: Bitmap,
+                    model: Any?,
+                    target: Target<Bitmap>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    saveImageToGallery(resource)
+                    Toast.makeText(
+                        requireContext(),
+                        "Сохранено в галерею",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return true
+                }
+            })
+            .submit()
+    }
+
+    private fun saveImageToGallery(bitmap: Bitmap) {
+        val filename = "image_${System.currentTimeMillis()}.jpg"
+
+        val resolver = requireContext().contentResolver
+
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Itemly")
+        }
+
+        val imageUri = resolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )
+
+        imageUri?.let { uri ->
+            resolver.openOutputStream(uri)?.use { stream ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            }
+        }
     }
 }

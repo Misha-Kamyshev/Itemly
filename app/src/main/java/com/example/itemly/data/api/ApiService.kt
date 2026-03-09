@@ -76,5 +76,8 @@ interface ApiService {
 
     @POST("items/get_items_author")
     suspend fun getItemsAuthor(@Body request: ItemsRequest): ItemsData
+
+    @POST("items/delete_item")
+    suspend fun deleteItem(@Body request: ItemRequest): Response<Unit>
 }
 
