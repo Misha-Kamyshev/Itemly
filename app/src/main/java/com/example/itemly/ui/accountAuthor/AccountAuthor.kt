@@ -1,5 +1,6 @@
 package com.example.itemly.ui.accountAuthor
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,12 +24,33 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-class AccountAuthor(
-    private val usernameAuthor: String
-) : Fragment() {
+class AccountAuthor : Fragment() {
     private var _binding: FragmentAccountBinding? = null
     private val binding get() = _binding!!
     private val viewModel = AccountAuthorViewModel()
+    private lateinit var usernameAuthor: String
+
+    companion object {
+        private const val ARG_ITEM = "arg_item"
+
+        fun newInstance(data: String): AccountAuthor {
+            return AccountAuthor().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_ITEM, data)
+                }
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        usernameAuthor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requireArguments().getString(ARG_ITEM, "")!!
+        } else {
+            @Suppress("DEPRECATION")
+            requireArguments().getString(ARG_ITEM) as String
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

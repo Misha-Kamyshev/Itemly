@@ -51,7 +51,6 @@ class DetailImageFragment : Fragment() {
     private val binding get() = _binding!!
     private val favoriteViewModel: FavoriteViewModel by activityViewModels()
     private lateinit var username: String
-    private lateinit var info: ItemInformation
 
     companion object {
         private const val ARG_ITEM = "arg_item"
@@ -95,7 +94,7 @@ class DetailImageFragment : Fragment() {
 
     private fun setupAdapters() {
         viewLifecycleOwner.lifecycleScope.launch {
-            info = getInformation()
+            val info = getInformation()
 
             val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
@@ -107,10 +106,10 @@ class DetailImageFragment : Fragment() {
                 viewLifecycleOwner,
                 favoriteViewModel,
                 onClickBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
-                onClickOther = { view -> onClickOther(view) },
+                onClickOther = { author, view -> onClickOther(author, view) },
                 onClickAuthor = {
                     (activity as? MainActivity)?.openDetailFragment(
-                        AccountAuthor(info.author)
+                        AccountAuthor.newInstance(it)
                     )
                 },
                 onClickTag = {
@@ -159,13 +158,13 @@ class DetailImageFragment : Fragment() {
         }
     }
 
-    private fun onClickOther(view: View) {
+    private fun onClickOther(author: String, view: View) {
         val popupMenu = PopupMenu(requireContext(), view)
         popupMenu.menuInflater.inflate(R.menu.menu_detail_image, popupMenu.menu)
 
         val deleteItem = popupMenu.menu.findItem(R.id.action_delete)
 
-        deleteItem.isVisible = username == info.author
+        deleteItem.isVisible = username == author
 
         popupMenu.setOnMenuItemClickListener {
             when (it.itemId) {
