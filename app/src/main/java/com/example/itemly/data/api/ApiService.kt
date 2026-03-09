@@ -8,6 +8,7 @@ import com.example.itemly.data.model.item.ItemRequest
 import com.example.itemly.data.model.item.ItemSimilarRequest
 import com.example.itemly.data.model.item.ItemsData
 import com.example.itemly.data.model.item.ItemsRequest
+import com.example.itemly.data.model.item.SearchRequest
 import com.example.itemly.data.model.user.DataPreviewImageResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -79,5 +80,8 @@ interface ApiService {
 
     @POST("items/delete_item")
     suspend fun deleteItem(@Body request: ItemRequest): Response<Unit>
+
+    @POST("items/search_items")
+    suspend fun searchItems(@Body request: SearchRequest): ItemsData
 }
 

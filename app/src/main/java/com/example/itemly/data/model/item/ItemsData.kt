@@ -1,13 +1,14 @@
 package com.example.itemly.data.model.item
 
 import com.google.gson.annotations.SerializedName
+import retrofit2.http.Query
 import java.io.Serializable
 
 data class ItemDataSchema(
     val id: Int,
     @SerializedName("image_url")
     val imageUrl: String
-): Serializable
+) : Serializable
 
 data class ItemsData(
     val items: List<ItemDataSchema>,
@@ -44,4 +45,10 @@ data class ItemSimilarRequest(
     val tags: List<String>,
     @SerializedName("last_id")
     val lastId: Int? = null
+)
+
+data class SearchRequest(
+    val username: String,
+    val query: String,
+    val lastId: Int?
 )

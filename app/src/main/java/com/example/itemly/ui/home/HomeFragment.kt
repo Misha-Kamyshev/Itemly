@@ -3,13 +3,17 @@ package com.example.itemly.ui.home
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentHomeBinding
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.detailImage.DetailImageFragment
@@ -17,11 +21,15 @@ import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.ui.viewModel.HomeViewModel
 import com.example.itemly.utils.StaggeredGridSpacingItemDecoration
 import com.example.itemly.utils.subscribeDataForAdapter
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val viewModel: HomeViewModel by activityViewModels()
+    private var searchJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,6 +44,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapter()
+        setupSearchDebounce()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -75,5 +84,30 @@ class HomeFragment : Fragment() {
             viewLifecycleOwner,
             viewModel
         )
+    }
+
+    private fun setupSearchDebounce() {
+        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
+        val username = pref.getString(PrefKeys.USERNAME, "")!!
+        binding.editSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                searchJob?.cancel()
+
+                searchJob = lifecycleScope.launch {
+                    delay(500)
+
+                    val query = s.toString()
+
+                    if (query.isBlank()) {
+                        viewModel.clearSearch(username, requireContext())
+                    } else {
+                        viewModel.startSearch(username, query, requireContext())
+                    }
+                }
+            }
+        })
     }
 }
