@@ -12,7 +12,7 @@ class HomeViewModel : BaseViewModel(
         if (query.isNullOrBlank()) {
             ApiClient.apiService.getMain(ItemsRequest(username, lastId))
         } else {
-            ApiClient.apiService.searchItems(SearchRequest(username, query, lastId))
+            ApiClient.apiService.searchItems(SearchRequest(query, lastId))
         }
     }
 ) {

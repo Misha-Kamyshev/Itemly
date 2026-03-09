@@ -48,7 +48,6 @@ data class ItemSimilarRequest(
 )
 
 data class SearchRequest(
-    val username: String,
     val query: String,
     val lastId: Int?
 )

@@ -5,10 +5,10 @@ import com.example.itemly.data.api.ApiClient
 import com.example.itemly.data.model.item.SearchRequest
 
 class SearchTagViewModel : BaseViewModel(
-    { username, lastId ->
+    { _, lastId ->
         val query = SearchState.query
 
-        ApiClient.apiService.searchItems(SearchRequest(username, query, lastId))
+        ApiClient.apiService.searchItems(SearchRequest(query, lastId))
     }
 ) {
     object SearchState {
