@@ -67,22 +67,4 @@ class BottomBarView @JvmOverloads constructor(
             .setInterpolator(DecelerateInterpolator())
             .start()
     }
-
-    fun restorePrevious() {
-        lastCurrentItem!!.let {
-            currentItem = it
-
-            navHome.isSelected = it == Item.HOME
-            navFavorite.isSelected = it == Item.FAVORITE
-            navAdd.isSelected = false
-            navMyImage.isSelected = it == Item.MY_IMAGE
-            navAccount.isSelected = it == Item.ACCOUNT
-
-            animateItem(navHome, it == Item.HOME)
-            animateItem(navFavorite, it == Item.FAVORITE)
-            animateItem(navAdd, false)
-            animateItem(navMyImage, it == Item.MY_IMAGE)
-            animateItem(navAccount, it == Item.ACCOUNT)
-        }
-    }
 }

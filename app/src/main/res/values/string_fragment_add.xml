@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="photo">Фото</string>
-    <string name="collage">Коллаж</string>
-    <string name="title_fragment_add">Опубликуйте что-нибудь</string>
+    <string name="hint_album">Альбом</string>
 </resources>

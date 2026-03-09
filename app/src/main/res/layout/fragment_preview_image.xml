@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Опубликовать"
+            android:text="@string/preview_title"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -61,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:contentDescription="TODO"
+                android:contentDescription="@string/detail_photo"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -82,7 +82,7 @@
                     android:id="@+id/titleEditTextFragmentPreviewImage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Название"
+                    android:hint="@string/preview_hint"
                     android:inputType="textCapSentences"
                     android:maxLines="1"
                     android:padding="12dp" />
@@ -108,7 +108,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="10dp"
                 android:backgroundTint="@color/main_color"
-                android:text="Добавить поле для тэга"
+                android:text="@string/preview_text_button"
                 android:textColor="@android:color/black"
                 app:cornerRadius="14dp"
                 app:layout_constraintEnd_toEndOf="parent"

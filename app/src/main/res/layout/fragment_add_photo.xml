@@ -44,7 +44,7 @@
                 android:layout_width="200dp"
                 android:layout_gravity="center"
                 android:layout_height="wrap_content"
-                android:hint="Альбом">
+                android:hint="@string/hint_album">
 
                 <AutoCompleteTextView
                     android:id="@+id/actvAlbums"
