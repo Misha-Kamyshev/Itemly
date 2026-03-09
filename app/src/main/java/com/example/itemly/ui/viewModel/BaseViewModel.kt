@@ -1,6 +1,7 @@
 package com.example.itemly.ui.viewModel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -55,7 +56,8 @@ abstract class BaseViewModel(
                     lastId = newItems.last().id
                     isLastPage = !response.hasNext
                 }
-            } catch (_: HttpException) {
+            } catch (e: HttpException) {
+                Log.w("ERRRRORRRR", e.response().toString())
                 httpToast(context)
             } catch (_: IOException) {
                 ioToast(context)

@@ -37,7 +37,12 @@ class AdapterImageView(
 
     override fun getItemCount(): Int = data.size
 
-    fun submitList(list: MutableList<ItemDataSchema>) {
+    fun submitList(list: MutableList<ItemDataSchema>, clear: Boolean = false) {
+        if (clear) {
+            data.clear()
+            notifyDataSetChanged()
+        }
+
         val startIndex = data.size
 
         val newItems = list.filter { newItem ->

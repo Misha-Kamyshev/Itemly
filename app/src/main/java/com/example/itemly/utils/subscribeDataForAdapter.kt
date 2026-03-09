@@ -34,7 +34,11 @@ fun subscribeDataForAdapter(
     })
 
     viewModel.items.observe(viewLifecycleOwner) { items ->
-        adapter.submitList(items.toMutableList())
+        if (items.isEmpty()) {
+            adapter.submitList(items.toMutableList(), clear = true)
+        } else {
+            adapter.submitList(items.toMutableList())
+        }
     }
     viewModel.loadFirstPage(username, context)
 }

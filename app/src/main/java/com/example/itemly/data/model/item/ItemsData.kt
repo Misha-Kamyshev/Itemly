@@ -1,7 +1,6 @@
 package com.example.itemly.data.model.item
 
 import com.google.gson.annotations.SerializedName
-import retrofit2.http.Query
 import java.io.Serializable
 
 data class ItemDataSchema(
@@ -49,5 +48,6 @@ data class ItemSimilarRequest(
 
 data class SearchRequest(
     val query: String,
+    @SerializedName("last_id")
     val lastId: Int?
 )

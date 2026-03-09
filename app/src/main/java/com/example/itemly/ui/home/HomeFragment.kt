@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -45,6 +46,7 @@ class HomeFragment : Fragment() {
 
         setupAdapter()
         setupSearchDebounce()
+        setupBackPressed()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -53,8 +55,11 @@ class HomeFragment : Fragment() {
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
         val adapter = AdapterImageView(mutableListOf()) { data ->
-            if (!binding.editSearch.hasFocus())
-                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(data))
+            val imm =
+                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(binding.editSearch.windowToken, 0)
+
+            (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(data))
         }
 
         binding.recyclerFragmentHome.apply {
@@ -89,25 +94,63 @@ class HomeFragment : Fragment() {
     private fun setupSearchDebounce() {
         val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
         val username = pref.getString(PrefKeys.USERNAME, "")!!
-        binding.editSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        binding.editSearch.apply {
+            addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
 
-            override fun afterTextChanged(s: Editable?) {
-                searchJob?.cancel()
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
-                searchJob = lifecycleScope.launch {
-                    delay(500)
+                override fun afterTextChanged(s: Editable?) {
+                    searchJob?.cancel()
 
-                    val query = s.toString()
+                    searchJob = lifecycleScope.launch {
+                        delay(500)
 
-                    if (query.isBlank()) {
-                        viewModel.clearSearch(username, requireContext())
-                    } else {
-                        viewModel.startSearch(username, query, requireContext())
+                        val query = s.toString()
+
+                        if (query.isBlank()) {
+                            viewModel.clearSearch(username, requireContext())
+                        } else {
+                            viewModel.startSearch(username, query, requireContext())
+                        }
                     }
                 }
+            })
+
+            setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+                    val imm =
+                        requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(binding.editSearch.windowToken, 0)
+                    binding.editSearch.clearFocus()
+                    true
+                } else {
+                    false
+                }
             }
-        })
+        }
+    }
+
+    private fun setupBackPressed() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            val text = binding.editSearch.text.toString()
+            if (text.isNotEmpty()) {
+                binding.editSearch.text?.clear()
+                binding.editSearch.clearFocus()
+                val imm =
+                    requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(binding.editSearch.windowToken, 0)
+            } else {
+                isEnabled = false
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+                isEnabled = true
+            }
+        }
     }
 }

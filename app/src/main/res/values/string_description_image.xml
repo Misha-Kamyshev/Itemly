@@ -5,6 +5,7 @@
     <string name="ic_comment">Иконка комментариев</string>
     <string name="ic_ok">Иконка галочки</string>
     <string name="ic_back">Иконка назад</string>
+    <string name="ic_setting">Иконка настроек</string>
 
     <!--  Bottom Bar  -->
     <string name="menu_home">Главная</string>
@@ -26,4 +27,7 @@
 
     <!--  ItemGalleryPhoto  -->
     <string name="photo_from_gallery">Фото из галери</string>
+
+    <!--  AccountFragment  -->
+    <string name="photo_account">Фото акаунта</string>
 </resources>

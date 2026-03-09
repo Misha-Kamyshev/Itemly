@@ -1,6 +1,5 @@
 package com.example.itemly.ui.searchTag
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentHomeBinding
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.detailImage.DetailImageFragment
@@ -59,8 +57,11 @@ class SearchTagFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.editSearch.isClickable = false
-        binding.editSearch.isFocusableInTouchMode = false
+        binding.editSearch.apply {
+            isClickable = false
+            isFocusableInTouchMode = false
+            setText(this@SearchTagFragment.tag)
+        }
 
         viewModel.startSearch(tag)
 
