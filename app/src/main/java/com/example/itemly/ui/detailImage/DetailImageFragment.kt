@@ -35,6 +35,7 @@ import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.components.httpToast
 import com.example.itemly.ui.components.ioToast
 import com.example.itemly.ui.main.MainActivity
+import com.example.itemly.ui.searchTag.SearchTagFragment
 import com.example.itemly.ui.viewModel.FavoriteViewModel
 import com.example.itemly.ui.viewModel.DetailImageViewModel
 import com.example.itemly.utils.StaggeredGridSpacingItemDecoration
@@ -110,6 +111,11 @@ class DetailImageFragment : Fragment() {
                 onClickAuthor = {
                     (activity as? MainActivity)?.openDetailFragment(
                         AccountAuthor(info.author)
+                    )
+                },
+                onClickTag = {
+                    (activity as? MainActivity)?.openDetailFragment(
+                        SearchTagFragment.newInstance(it)
                     )
                 }
             )

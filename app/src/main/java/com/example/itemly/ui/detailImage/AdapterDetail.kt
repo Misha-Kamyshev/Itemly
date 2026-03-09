@@ -36,7 +36,8 @@ class AdapterDetail(
     private val favoriteViewModel: FavoriteViewModel,
     private val onClickBack: () -> Unit,
     private val onClickOther: (View) -> Unit,
-    private val onClickAuthor: () -> Unit
+    private val onClickAuthor: () -> Unit,
+    private val onClickTag: (String) -> Unit
 ) : RecyclerView.Adapter<AdapterDetail.ViewHolder>() {
     private val saveItem = MutableLiveData(false)
     private val countLike = MutableLiveData(0)
@@ -71,7 +72,9 @@ class AdapterDetail(
             onClickOther(it)
         }
 
-        val adapterTags = AdapterTagsDetailImageFragment {}
+        val adapterTags = AdapterTagsDetailImageFragment {
+            onClickTag(it)
+        }
 
         binding.includeBlockTagsDetailImageFragment.tagsRecyclerDetailImage.apply {
             adapter = adapterTags
