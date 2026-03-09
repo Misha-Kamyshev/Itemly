@@ -2,6 +2,7 @@ package com.example.itemly.ui.detailImage
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
@@ -34,6 +35,7 @@ class AdapterDetail(
     private val lifecycleOwner: LifecycleOwner,
     private val favoriteViewModel: FavoriteViewModel,
     private val onClickBack: () -> Unit,
+    private val onClickOther: (View) -> Unit,
     private val onClickAuthor: () -> Unit
 ) : RecyclerView.Adapter<AdapterDetail.ViewHolder>() {
     private val saveItem = MutableLiveData(false)
@@ -64,6 +66,9 @@ class AdapterDetail(
 
         binding.buttonBackFragmentDetailImage.setOnClickListener {
             onClickBack()
+        }
+        binding.buttonOtherFragmentDetailImage.setOnClickListener {
+            onClickOther(it)
         }
 
         val adapterTags = AdapterTagsDetailImageFragment {}

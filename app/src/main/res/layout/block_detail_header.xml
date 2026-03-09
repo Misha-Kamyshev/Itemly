@@ -42,6 +42,25 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/buttonOtherFragmentDetailImage"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="@color/white_transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="0dp">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_menu_vertical" />
+
+    </com.google.android.material.card.MaterialCardView>
+
     <include
         android:id="@+id/includeBlockTagsDetailImageFragment"
         layout="@layout/block_tags_detail_image"

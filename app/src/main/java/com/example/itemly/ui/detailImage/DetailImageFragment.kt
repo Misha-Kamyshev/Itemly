@@ -6,11 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.example.itemly.R
 import com.example.itemly.data.api.ApiClient
 import com.example.itemly.data.model.item.ItemDataSchema
 import com.example.itemly.data.model.item.ItemInformation
@@ -36,6 +38,7 @@ class DetailImageFragment : Fragment() {
     private val binding get() = _binding!!
     private val favoriteViewModel: FavoriteViewModel by activityViewModels()
     private lateinit var username: String
+    private lateinit var info: ItemInformation
 
     companion object {
         private const val ARG_ITEM = "arg_item"
@@ -79,7 +82,7 @@ class DetailImageFragment : Fragment() {
 
     private fun setupAdapters() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val info = getInformation()
+            info = getInformation()
 
             val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
@@ -91,6 +94,7 @@ class DetailImageFragment : Fragment() {
                 viewLifecycleOwner,
                 favoriteViewModel,
                 onClickBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
+                onClickOther = { view -> onClickOther(view) },
                 onClickAuthor = {
                     (activity as? MainActivity)?.openDetailFragment(
                         AccountAuthor(info.author)
@@ -123,7 +127,7 @@ class DetailImageFragment : Fragment() {
         }
     }
 
-    suspend fun getInformation(): ItemInformation {
+    private suspend fun getInformation(): ItemInformation {
         try {
             return ApiClient.apiService.getInformation(data.id, username)
         } catch (_: HttpException) {
@@ -135,5 +139,29 @@ class DetailImageFragment : Fragment() {
             requireActivity().onBackPressedDispatcher.onBackPressed()
             throw CancellationException()
         }
+    }
+
+    private fun onClickOther(view: View) {
+        val popupMenu = PopupMenu(requireContext(), view)
+        popupMenu.menuInflater.inflate(R.menu.menu_detail_image, popupMenu.menu)
+
+        val deleteItem = popupMenu.menu.findItem(R.id.action_delete)
+
+        deleteItem.isVisible = username == info.author
+
+        popupMenu.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_delete -> {
+                    true
+                }
+
+                R.id.action_download -> {
+                    true
+                }
+
+                else -> false
+            }
+        }
+        popupMenu.show()
     }
 }
