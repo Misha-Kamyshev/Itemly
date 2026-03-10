@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,10 +22,12 @@ import com.example.itemly.ui.detailImage.DetailImageFragment
 import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.ui.viewModel.AccountViewModel
 import com.example.itemly.utils.StaggeredGridSpacingItemDecoration
+import com.example.itemly.utils.logout
 import com.example.itemly.utils.subscribeDataForAdapter
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import androidx.core.content.edit
 
 class AccountFragment : Fragment() {
     private var _binding: FragmentAccountBinding? = null
@@ -34,6 +37,18 @@ class AccountFragment : Fragment() {
     private lateinit var email: String
     private lateinit var headerAdapter: HeaderAdapter
     private lateinit var adapterItem: AdapterImageView
+
+    companion object {
+        private const val PREF_THEME = "pref_theme"
+        private const val PREF_SETTING = "setting"
+        private const val PREF_SETTING_VISIBLE = "pref_setting_visible"
+    }
+
+    enum class ThemeMode {
+        SYSTEM,
+        DARK,
+        LIGHT
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,10 +66,24 @@ class AccountFragment : Fragment() {
         email = pref.getString(PrefKeys.E_MAIL, "")!!
 
         setupAdapter()
+        applySavedTheme()
+        restoreSettingState()
 
         binding.swipeRefreshAccount.setOnRefreshListener {
             refreshPage()
             binding.swipeRefreshAccount.isRefreshing = false
+        }
+
+        binding.layoutSetting.apply {
+            root.setOnClickListener { closeSetting() }
+            icClose.setOnClickListener { closeSetting() }
+            blockSetting.setOnClickListener {}
+
+            changeTheme.setOnClickListener { changeTheme() }
+            logoutAccount.setOnClickListener {
+                logout(requireContext())
+                (activity as? MainActivity)?.logoutAccount()
+            }
         }
     }
 
@@ -84,7 +113,8 @@ class AccountFragment : Fragment() {
             email = email,
             iconAccountUrl = null,
             userAuthor = false,
-            onClickPreviewPhoto = { onClickPreviewAccount() }
+            onClickPreviewPhoto = { onClickPreviewAccount() },
+            onClickSetting = { setupSetting() }
         )
 
         val concatAdapter = ConcatAdapter(headerAdapter, adapterItem)
@@ -124,6 +154,92 @@ class AccountFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             loadAvatar()
             viewModel.refresh(username, requireContext())
+        }
+    }
+
+    private fun applySavedTheme() {
+        val pref = requireContext().getSharedPreferences(PREF_SETTING, Context.MODE_PRIVATE)
+
+        val theme = ThemeMode.valueOf(
+            pref.getString(PREF_THEME, ThemeMode.SYSTEM.name)!!
+        )
+
+        when (theme) {
+            ThemeMode.SYSTEM -> {
+                binding.layoutSetting.changeTheme.text = "Системная"
+            }
+            ThemeMode.DARK -> {
+                binding.layoutSetting.changeTheme.text = "Тёмная"
+            }
+            ThemeMode.LIGHT -> {
+                binding.layoutSetting.changeTheme.text = "Светлая"
+            }
+        }
+    }
+
+    private fun setupSetting() {
+        binding.layoutSetting.root.visibility = View.VISIBLE
+        saveSettingState(true)
+    }
+
+    private fun closeSetting() {
+        binding.layoutSetting.root.visibility = View.GONE
+        saveSettingState(false)
+    }
+
+    private fun saveSettingState(isVisible: Boolean) {
+        requireContext()
+            .getSharedPreferences(PREF_SETTING, Context.MODE_PRIVATE)
+            .edit {
+                putBoolean(PREF_SETTING_VISIBLE, isVisible)
+            }
+    }
+
+    private fun restoreSettingState() {
+        val pref = requireContext()
+            .getSharedPreferences(PREF_SETTING, Context.MODE_PRIVATE)
+
+        val visible = pref.getBoolean(PREF_SETTING_VISIBLE, false)
+
+        binding.layoutSetting.root.visibility =
+            if (visible) View.VISIBLE else View.GONE
+    }
+
+    fun changeTheme() {
+        val pref = requireContext().getSharedPreferences(PREF_SETTING, Context.MODE_PRIVATE)
+        val current = ThemeMode.valueOf(
+            pref.getString(PREF_THEME, ThemeMode.SYSTEM.name)!!
+        )
+
+        val next = when (current) {
+            ThemeMode.SYSTEM -> ThemeMode.DARK
+            ThemeMode.DARK -> ThemeMode.LIGHT
+            ThemeMode.LIGHT -> ThemeMode.SYSTEM
+        }
+
+        pref.edit { putString(PREF_THEME, next.name) }
+
+        when (next) {
+            ThemeMode.SYSTEM -> {
+                AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                )
+                binding.layoutSetting.changeTheme.text = "Системная"
+            }
+
+            ThemeMode.DARK -> {
+                AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_YES
+                )
+                binding.layoutSetting.changeTheme.text = "Тёмная"
+            }
+
+            ThemeMode.LIGHT -> {
+                AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_NO
+                )
+                binding.layoutSetting.changeTheme.text = "Светлая"
+            }
         }
     }
 }

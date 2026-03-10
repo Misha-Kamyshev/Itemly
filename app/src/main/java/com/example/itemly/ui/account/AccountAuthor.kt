@@ -1,4 +1,4 @@
-package com.example.itemly.ui.accountAuthor
+package com.example.itemly.ui.account
 
 import android.os.Build
 import android.os.Bundle
@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.itemly.data.api.ApiClient
 import com.example.itemly.databinding.FragmentAccountBinding
-import com.example.itemly.ui.account.HeaderAdapter
 import com.example.itemly.ui.components.httpToast
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.components.ioToast
@@ -73,7 +72,11 @@ class AccountAuthor : Fragment() {
             layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
             val adapterItem = AdapterImageView(mutableListOf()) { item ->
-                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(item))
+                (activity as? MainActivity)?.openDetailFragment(
+                    DetailImageFragment.Companion.newInstance(
+                        item
+                    )
+                )
             }
 
             val headerAdapter = HeaderAdapter(

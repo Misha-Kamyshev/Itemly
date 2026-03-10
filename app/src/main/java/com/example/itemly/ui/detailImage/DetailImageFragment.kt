@@ -30,7 +30,7 @@ import com.example.itemly.data.model.item.ItemInformation
 import com.example.itemly.data.model.item.ItemRequest
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentDetailImageBinding
-import com.example.itemly.ui.accountAuthor.AccountAuthor
+import com.example.itemly.ui.account.AccountAuthor
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.components.httpToast
 import com.example.itemly.ui.components.ioToast

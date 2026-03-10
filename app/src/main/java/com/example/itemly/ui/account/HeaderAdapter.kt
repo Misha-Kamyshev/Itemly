@@ -18,7 +18,8 @@ class HeaderAdapter(
     private val email: String?,
     private var iconAccountUrl: String?,
     private val userAuthor: Boolean,
-    private val onClickPreviewPhoto: () -> Unit
+    private val onClickPreviewPhoto: () -> Unit,
+    private val onClickSetting: () -> Unit = {}
 ) : RecyclerView.Adapter<HeaderAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val username: MaterialTextView = view.findViewById(R.id.usernameAccount)
@@ -66,6 +67,9 @@ class HeaderAdapter(
             holder.buttonSetting.visibility = View.GONE
         } else {
             holder.buttonSetting.visibility = View.VISIBLE
+            holder.buttonSetting.setOnClickListener {
+                onClickSetting()
+            }
         }
     }
 

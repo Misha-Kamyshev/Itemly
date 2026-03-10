@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text_theme">Тема приложения</string>
+    <string name="button_exit">Выйти из акаунта</string>
+</resources>

@@ -9,4 +9,14 @@
         <item name="cornerSizeBottomRight">30dp</item>
 
     </style>
+
+    <style name="ShapeTopRounded">
+
+        <item name="cornerSizeTopLeft">30dp</item>
+        <item name="cornerSizeTopRight">30dp</item>
+
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+
+    </style>
 </resources>

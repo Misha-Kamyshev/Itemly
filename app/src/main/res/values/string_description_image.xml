@@ -6,6 +6,7 @@
     <string name="ic_back">Иконка назад</string>
     <string name="ic_setting">Иконка настроек</string>
     <string name="ic_menu">Иконка меню</string>
+    <string name="ic_close">Иконка закрыть</string>
 
     <!--  Bottom Bar  -->
     <string name="menu_home">Главная</string>
@@ -16,8 +17,6 @@
 
     <!--  HomeFragment  -->
     <string name="home_items">Изображение</string>
-
-    <!--  AddFragment  -->
 
     <!--  DetailFragment  -->
     <string name="detail_user_image">Фото профиля автора</string>
