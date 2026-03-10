@@ -68,21 +68,22 @@ class AccountAuthor : Fragment() {
     }
 
     private fun setupAdapter() {
-        val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+        viewLifecycleOwner.lifecycleScope.launch {
+            val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
-        val adapterItem = AdapterImageView(mutableListOf()) { item ->
-            (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(item))
-        }
+            val adapterItem = AdapterImageView(mutableListOf()) { item ->
+                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(item))
+            }
 
-        val headerAdapter = HeaderAdapter(
-            username = usernameAuthor,
-            email = null,
-            iconAccountUrl = getIconAccount(),
-            userAuthor = true
-        )
+            val headerAdapter = HeaderAdapter(
+                username = usernameAuthor,
+                email = null,
+                iconAccountUrl = getIconAccount(),
+                userAuthor = true,
+            )
 
-        val concatAdapter = ConcatAdapter(headerAdapter, adapterItem)
+            val concatAdapter = ConcatAdapter(headerAdapter, adapterItem)
 
         binding.recyclerAccount.apply {
             this.adapter = concatAdapter
@@ -90,30 +91,27 @@ class AccountAuthor : Fragment() {
             this.addItemDecoration(StaggeredGridSpacingItemDecoration(2, 10, true))
         }
 
-        subscribeDataForAdapter(
-            requireContext(),
-            binding.recyclerAccount,
-            adapterItem,
-            layout,
-            viewLifecycleOwner,
-            viewModel
-        )
+            subscribeDataForAdapter(
+                requireContext(),
+                binding.recyclerAccount,
+                adapterItem,
+                layout,
+                viewLifecycleOwner,
+                viewModel
+            )
+        }
     }
 
-    private fun getIconAccount(): String? {
-        var iconAccountUrl: String? = null
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val response = ApiClient.apiService.getImageUser(usernameAuthor)
-                iconAccountUrl = response.pathPreview
-            } catch (_: HttpException) {
-                httpToast(requireContext())
-            } catch (_: IOException) {
-                ioToast(requireContext())
-            }
+    private suspend fun getIconAccount(): String? {
+        return try {
+            val response = ApiClient.apiService.getImageUser(usernameAuthor)
+            response.pathPreview
+        } catch (_: HttpException) {
+            httpToast(requireContext())
+            null
+        } catch (_: IOException) {
+            ioToast(requireContext())
+            null
         }
-
-        return iconAccountUrl
     }
 }

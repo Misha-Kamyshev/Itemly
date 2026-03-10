@@ -31,6 +31,8 @@ class AccountFragment : Fragment() {
     private val viewModel: AccountViewModel by activityViewModels()
     private lateinit var username: String
     private lateinit var email: String
+    private lateinit var headerAdapter: HeaderAdapter
+    private lateinit var adapterItem: AdapterImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,36 +52,34 @@ class AccountFragment : Fragment() {
         setupAdapter()
     }
 
-    private fun getIconAccount(): String? {
-        var iconAccountUrl: String? = null
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val response = ApiClient.apiService.getImageUser(username)
-                iconAccountUrl = response.pathPreview
-            } catch (_: HttpException) {
-                httpToast(requireContext())
-            } catch (_: IOException) {
-                ioToast(requireContext())
-            }
+    private suspend fun getIconAccount(): String? {
+        return try {
+            val response = ApiClient.apiService.getImageUser(username)
+            response.pathPreview
+        } catch (_: HttpException) {
+            httpToast(requireContext())
+            null
+        } catch (_: IOException) {
+            ioToast(requireContext())
+            null
         }
-
-        return iconAccountUrl
     }
 
     private fun setupAdapter() {
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
-        val adapterItem = AdapterImageView(mutableListOf()) { item ->
+        adapterItem = AdapterImageView(mutableListOf()) { item ->
             (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(item))
         }
 
-        val headerAdapter = HeaderAdapter(
+        headerAdapter = HeaderAdapter(
             username = username,
             email = email,
             iconAccountUrl = getIconAccount(),
             userAuthor = false
+            iconAccountUrl = null,
+            userAuthor = false,
         )
 
         val concatAdapter = ConcatAdapter(headerAdapter, adapterItem)
@@ -98,5 +98,17 @@ class AccountFragment : Fragment() {
             viewLifecycleOwner,
             viewModel
         )
+
+        loadAvatar()
+    }
+
+    private fun loadAvatar() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val icon = getIconAccount()
+
+            headerAdapter.updateIcon(icon)
+            headerAdapter.notifyItemChanged(0)
+        }
+    }
     }
 }

@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.itemly.R
 import com.example.itemly.data.api.ApiClient
 import com.example.itemly.data.api.ApiConstants
@@ -116,15 +117,22 @@ class AdapterDetail(
         countLike.value = info.countLike
 
         if (info.iconAuthor.isNullOrEmpty()) {
-            binding.includeBlockTagsDetailImageFragment.imageUserPushDetailImage.setImageResource(
-                R.drawable.ic_account
-            )
+            binding.includeBlockTagsDetailImageFragment.apply {
+                iconUserPushDetailImage.visibility = View.VISIBLE
+                imageUserPushDetailImage.visibility = View.GONE
+            }
         } else {
-            Glide.with(binding.includeBlockTagsDetailImageFragment.imageUserPushDetailImage.context)
-                .load(ApiConstants.BASE_URL + info.iconAuthor)
-                .placeholder(R.drawable.ic_account)
-                .error(R.drawable.ic_account)
-                .into(binding.includeBlockTagsDetailImageFragment.imageUserPushDetailImage)
+            binding.includeBlockTagsDetailImageFragment.apply {
+                iconUserPushDetailImage.visibility = View.GONE
+                imageUserPushDetailImage.visibility = View.VISIBLE
+
+                Glide.with(imageUserPushDetailImage.context)
+                    .load(ApiConstants.BASE_URL + info.iconAuthor)
+                    .error(R.drawable.ic_account)
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(imageUserPushDetailImage)
+            }
         }
     }
 

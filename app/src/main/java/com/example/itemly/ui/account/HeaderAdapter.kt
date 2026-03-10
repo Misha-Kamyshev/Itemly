@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.itemly.R
 import com.example.itemly.data.api.ApiConstants
 import com.google.android.material.card.MaterialCardView
@@ -15,13 +16,15 @@ import com.google.android.material.textview.MaterialTextView
 class HeaderAdapter(
     private val username: String,
     private val email: String?,
-    private val iconAccountUrl: String?,
-    private val userAuthor: Boolean
+    private var iconAccountUrl: String?,
+    private val userAuthor: Boolean,
+    private val onClickPreviewPhoto: () -> Unit
 ) : RecyclerView.Adapter<HeaderAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val username: MaterialTextView = view.findViewById(R.id.usernameAccount)
         val email: MaterialTextView = view.findViewById(R.id.emailAccount)
-        val icon: ImageView = view.findViewById(R.id.imageAccount)
+        val icon: ImageView = view.findViewById(R.id.iconAccount)
+        val image: ImageView = view.findViewById(R.id.imageAccount)
         val buttonSetting: MaterialCardView = view.findViewById(R.id.buttonSettingsAccount)
     }
 
@@ -41,14 +44,23 @@ class HeaderAdapter(
         }
 
         if (iconAccountUrl.isNullOrEmpty()) {
-            holder.icon.setImageResource(R.drawable.ic_account)
+            holder.icon.visibility = View.VISIBLE
+            holder.image.visibility = View.GONE
         } else {
-            Glide.with(holder.icon.context)
+            holder.icon.visibility = View.GONE
+            holder.image.visibility = View.VISIBLE
+
+            Glide.with(holder.image.context)
                 .load(ApiConstants.BASE_URL + iconAccountUrl)
                 .placeholder(R.drawable.ic_account)
                 .error(R.drawable.ic_account)
-                .into(holder.icon)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(holder.image)
         }
+
+        holder.image.setOnClickListener { onClickPreviewPhoto() }
+        holder.icon.setOnClickListener { onClickPreviewPhoto() }
 
         if (userAuthor) {
             holder.buttonSetting.visibility = View.GONE
@@ -66,5 +78,9 @@ class HeaderAdapter(
         if (params is StaggeredGridLayoutManager.LayoutParams) {
             params.isFullSpan = true
         }
+    }
+
+    fun updateIcon(newIcon: String?) {
+        iconAccountUrl = newIcon
     }
 }
