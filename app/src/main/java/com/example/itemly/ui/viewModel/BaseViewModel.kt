@@ -56,8 +56,7 @@ abstract class BaseViewModel(
                     lastId = newItems.last().id
                     isLastPage = !response.hasNext
                 }
-            } catch (e: HttpException) {
-                Log.w("ERRRRORRRR", e.response().toString())
+            } catch (_: HttpException) {
                 httpToast(context)
             } catch (_: IOException) {
                 ioToast(context)
@@ -76,18 +75,13 @@ abstract class BaseViewModel(
         viewModelScope.launch {
             try {
                 isLoading = true
-
                 val response = request(username, null)
-
                 val newItems = response.items
 
                 _items.value = newItems
-
                 lastId = newItems.lastOrNull()?.id
                 isLastPage = !response.hasNext
-
-            } catch (e: HttpException) {
-                Log.w("ERRRRORRRR", e.response().toString())
+            } catch (_: HttpException) {
                 httpToast(context)
             } catch (_: IOException) {
                 ioToast(context)
