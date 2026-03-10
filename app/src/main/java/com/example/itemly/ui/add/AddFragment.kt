@@ -2,6 +2,7 @@ package com.example.itemly.ui.add
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -11,25 +12,38 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.itemly.R
+import com.example.itemly.data.api.ApiClient
+import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentAddPhotoBinding
+import com.example.itemly.ui.components.httpToast
+import com.example.itemly.ui.components.ioToast
 import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.ui.previewImage.PreviewImageFragment
 import com.example.itemly.utils.GridSpacingItemDecoration
 import com.example.itemly.utils.loadAlbums
 import com.example.itemly.utils.loadImagesFromAlbum
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.IOException
 
 class AddFragment : Fragment() {
     private var _binding: FragmentAddPhotoBinding? = null
     private val binding get() = _binding!!
     private var selectedImage: Uri? = null
     private lateinit var cameraPhotoUri: Uri
-
+    private var previewImage: Boolean = false
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -38,6 +52,29 @@ class AddFragment : Fragment() {
                 showNoAccessLayout()
             }
         }
+
+    companion object {
+        private const val ARG_ITEM = "arg_item"
+
+        fun newInstance(previewImage: Boolean): AddFragment {
+            return AddFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean(ARG_ITEM, previewImage)
+                }
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        previewImage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requireArguments().getBoolean(ARG_ITEM, false)
+        } else {
+            @Suppress("DEPRECATION")
+            (requireArguments().getBoolean(ARG_ITEM))
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,12 +92,16 @@ class AddFragment : Fragment() {
 
         checkGalleryPermission()
         binding.acceptSelectedFragmentAddPhoto.setOnClickListener {
-            val fragment = PreviewImageFragment().apply {
-                arguments = Bundle().apply {
-                    putString("photo_uri", selectedImage.toString())
+            if (previewImage) {
+                changePreviewPhoto()
+            } else {
+                val fragment = PreviewImageFragment().apply {
+                    arguments = Bundle().apply {
+                        putString("photo_uri", selectedImage.toString())
+                    }
                 }
+                (activity as? MainActivity)?.openDetailFragment(fragment)
             }
-            (activity as? MainActivity)?.openDetailFragment(fragment)
         }
 
         binding.buttonBackFragmentAdd.setOnClickListener {
@@ -186,5 +227,50 @@ class AddFragment : Fragment() {
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             contentValues
         )!!
+    }
+
+    private fun changePreviewPhoto() {
+        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
+        val username = pref.getString(PrefKeys.USERNAME, "")!!
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val response = ApiClient.apiService.changePreview(
+                    username.toRequestBody("text/plain".toMediaType()),
+                    getImage()
+                )
+                if (response.isSuccessful) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Успешно",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                } else {
+                    httpToast(requireContext())
+                }
+            } catch (_: IOException) {
+                ioToast(requireContext())
+            }
+        }
+    }
+
+    private fun getImage(): MultipartBody.Part {
+        val uri = selectedImage!!
+
+        val context = requireContext()
+        val contentResolver = context.contentResolver
+        val mimeType = contentResolver.getType(uri) ?: "image/jpeg"
+        val inputStream = contentResolver.openInputStream(uri)
+
+        val tempFile = createTempFile(suffix = ".jpg", directory = context.cacheDir)
+        inputStream.use { input ->
+            tempFile.outputStream().use { output ->
+                input?.copyTo(output)
+            }
+        }
+
+        val requestBody = tempFile.asRequestBody(mimeType.toMediaTypeOrNull())
+        return MultipartBody.Part.createFormData("image", tempFile.name, requestBody)
     }
 }

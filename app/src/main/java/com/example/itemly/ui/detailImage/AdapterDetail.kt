@@ -211,7 +211,6 @@ class AdapterDetail(
                     val response =
                         ApiClient.apiService.deleteFavoriteItem(ItemRequest(data.id, username))
                     if (response.isSuccessful) {
-                        favoriteViewModel.removeItem(data.id)
                         saveItem.value = false
                     } else {
                         httpToast(context)

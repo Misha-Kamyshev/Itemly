@@ -67,11 +67,33 @@ abstract class BaseViewModel(
         }
     }
 
-    fun removeItem(itemId: Int) {
-        val currentList = _items.value ?: emptyList()
+    fun refresh(username: String, context: Context) {
+        if (isLoading) return
 
-        val updatedList = currentList.filter { it.id != itemId }
+        isLastPage = false
+        lastId = null
 
-        _items.value = updatedList
+        viewModelScope.launch {
+            try {
+                isLoading = true
+
+                val response = request(username, null)
+
+                val newItems = response.items
+
+                _items.value = newItems
+
+                lastId = newItems.lastOrNull()?.id
+                isLastPage = !response.hasNext
+
+            } catch (e: HttpException) {
+                Log.w("ERRRRORRRR", e.response().toString())
+                httpToast(context)
+            } catch (_: IOException) {
+                ioToast(context)
+            } finally {
+                isLoading = false
+            }
+        }
     }
 }

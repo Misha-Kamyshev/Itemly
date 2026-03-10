@@ -57,6 +57,13 @@ interface ApiService {
         @Part image: MultipartBody.Part
     ): Response<Unit>
 
+    @Multipart
+    @POST("user/change_preview")
+    suspend fun changePreview(
+        @Part("username") username: RequestBody,
+        @Part image: MultipartBody.Part
+    ): Response<Unit>
+
     @POST("items/get_favorite")
     suspend fun getFavorite(@Body request: ItemsRequest): ItemsData
 

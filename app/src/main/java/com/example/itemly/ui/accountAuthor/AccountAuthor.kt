@@ -81,15 +81,16 @@ class AccountAuthor : Fragment() {
                 email = null,
                 iconAccountUrl = getIconAccount(),
                 userAuthor = true,
+                onClickPreviewPhoto = {}
             )
 
             val concatAdapter = ConcatAdapter(headerAdapter, adapterItem)
 
-        binding.recyclerAccount.apply {
-            this.adapter = concatAdapter
-            this.layoutManager = layout
-            this.addItemDecoration(StaggeredGridSpacingItemDecoration(2, 10, true))
-        }
+            binding.recyclerAccount.apply {
+                this.adapter = concatAdapter
+                this.layoutManager = layout
+                this.addItemDecoration(StaggeredGridSpacingItemDecoration(2, 10, true))
+            }
 
             subscribeDataForAdapter(
                 requireContext(),

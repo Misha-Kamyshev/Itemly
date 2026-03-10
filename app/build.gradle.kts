@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.recyclerview)
     implementation(libs.flexbox)
+    implementation(libs.androidx.swiperefreshlayout)
 
     // Тестирование
     testImplementation(libs.junit)

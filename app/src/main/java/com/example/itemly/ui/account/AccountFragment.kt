@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.itemly.data.api.ApiClient
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentAccountBinding
+import com.example.itemly.ui.add.AddFragment
 import com.example.itemly.ui.components.httpToast
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.components.ioToast
@@ -50,6 +51,11 @@ class AccountFragment : Fragment() {
         email = pref.getString(PrefKeys.E_MAIL, "")!!
 
         setupAdapter()
+
+        binding.swipeRefreshAccount.setOnRefreshListener {
+            refreshPage()
+            binding.swipeRefreshAccount.isRefreshing = false
+        }
     }
 
     private suspend fun getIconAccount(): String? {
@@ -76,10 +82,9 @@ class AccountFragment : Fragment() {
         headerAdapter = HeaderAdapter(
             username = username,
             email = email,
-            iconAccountUrl = getIconAccount(),
-            userAuthor = false
             iconAccountUrl = null,
             userAuthor = false,
+            onClickPreviewPhoto = { onClickPreviewAccount() }
         )
 
         val concatAdapter = ConcatAdapter(headerAdapter, adapterItem)
@@ -102,6 +107,10 @@ class AccountFragment : Fragment() {
         loadAvatar()
     }
 
+    private fun onClickPreviewAccount() {
+        (activity as? MainActivity)?.openDetailFragment(AddFragment.newInstance(true))
+    }
+
     private fun loadAvatar() {
         viewLifecycleOwner.lifecycleScope.launch {
             val icon = getIconAccount()
@@ -110,5 +119,16 @@ class AccountFragment : Fragment() {
             headerAdapter.notifyItemChanged(0)
         }
     }
+
+    private fun refreshPage() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            loadAvatar()
+            viewModel.refresh(username, requireContext())
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshPage()
     }
 }
