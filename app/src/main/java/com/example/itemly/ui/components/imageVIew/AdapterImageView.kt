@@ -37,22 +37,40 @@ class AdapterImageView(
 
     override fun getItemCount(): Int = data.size
 
-    fun submitList(list: MutableList<ItemDataSchema>, clear: Boolean = false) {
+    fun submitList(list: List<ItemDataSchema>, clear: Boolean = false) {
         if (clear) {
             data.clear()
+            data.addAll(list)
             notifyDataSetChanged()
+            return
+        }
+
+        val iterator = data.listIterator()
+        while (iterator.hasNext()) {
+            val oldItem = iterator.next()
+            if (list.none { it.id == oldItem.id }) {
+                val index = iterator.previousIndex()
+                iterator.remove()
+                notifyItemRemoved(index)
+            }
         }
 
         val startIndex = data.size
-
         val newItems = list.filter { newItem ->
             data.none { it.id == newItem.id }
         }
 
         data.addAll(newItems)
-
         if (newItems.isNotEmpty()) {
             notifyItemRangeInserted(startIndex, newItems.size)
+        }
+
+        list.forEachIndexed { _, newItem ->
+            val oldIndex = data.indexOfFirst { it.id == newItem.id }
+            if (oldIndex != -1 && data[oldIndex] != newItem) {
+                data[oldIndex] = newItem
+                notifyItemChanged(oldIndex)
+            }
         }
     }
 }
