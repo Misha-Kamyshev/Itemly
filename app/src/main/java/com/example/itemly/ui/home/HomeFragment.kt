@@ -47,6 +47,11 @@ class HomeFragment : Fragment() {
         setupAdapter()
         setupSearchDebounce()
         setupBackPressed()
+
+        binding.swipeRefreshHome.setOnRefreshListener {
+            refresh()
+            binding.swipeRefreshHome.isRefreshing = false
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -152,5 +157,12 @@ class HomeFragment : Fragment() {
                 isEnabled = true
             }
         }
+    }
+
+    private fun refresh() {
+        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
+        val username = pref.getString(PrefKeys.USERNAME, "")!!
+
+        viewModel.refresh(username, requireContext())
     }
 }

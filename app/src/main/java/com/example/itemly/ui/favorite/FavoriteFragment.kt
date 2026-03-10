@@ -1,5 +1,6 @@
 package com.example.itemly.ui.favorite
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentFavoriteBinding
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.detailImage.DetailImageFragment
@@ -33,6 +35,11 @@ class FavoriteFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecycler()
+
+        binding.swipeRefreshFavorite.setOnRefreshListener {
+            refresh()
+            binding.swipeRefreshFavorite.isRefreshing = false
+        }
     }
 
     private fun setupRecycler() {
@@ -59,5 +66,12 @@ class FavoriteFragment : Fragment() {
             viewLifecycleOwner,
             viewModel
         )
+    }
+
+    private fun refresh() {
+        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
+        val username = pref.getString(PrefKeys.USERNAME, "")!!
+
+        viewModel.refresh(username, requireContext())
     }
 }
