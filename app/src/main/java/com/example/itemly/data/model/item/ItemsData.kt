@@ -28,6 +28,7 @@ data class ItemRequest(
 
 data class ItemInformation(
     val tags: List<String>,
+    @SerializedName("icon_author")
     val iconAuthor: String?,
     val author: String,
     val name: String,
