@@ -126,9 +126,4 @@ class AccountFragment : Fragment() {
             viewModel.refresh(username, requireContext())
         }
     }
-
-    override fun onResume() {
-        super.onResume()
-        refreshPage()
-    }
 }

@@ -4,7 +4,7 @@
     <string name="hint_search">Поиск</string>
     <string name="push_photo">Отправка фото…</string>
     <string name="title_top_bar_favorite">Вы сохранили</string>
-    <string name="title_top_bar_my_image">Ваши фото</string>
+    <string name="title_top_bar_my_image">Вы лайкнули</string>
     <string name="preview_title">Опубликовать</string>
     <string name="preview_hint">Название</string>
     <string name="preview_text_button">Добавить поле для тэга</string>

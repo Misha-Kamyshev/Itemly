@@ -39,7 +39,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:contentDescription="@string/menu_my_image"
-        android:src="@drawable/ic_image"
+        android:src="@drawable/ic_heart"
         app:tint="@color/bottom_nav_icon" />
 
     <ImageView

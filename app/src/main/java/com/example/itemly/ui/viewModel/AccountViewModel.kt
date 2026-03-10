@@ -5,6 +5,6 @@ import com.example.itemly.data.model.item.ItemsRequest
 
 class AccountViewModel : BaseViewModel(
     { username, lastId ->
-        ApiClient.apiService.getLike(ItemsRequest(username, lastId))
+        ApiClient.apiService.getMyImage(ItemsRequest(username, lastId))
     }
 )

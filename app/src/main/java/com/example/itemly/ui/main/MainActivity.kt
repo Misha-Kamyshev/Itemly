@@ -13,7 +13,7 @@ import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.ActivityMainBinding
 import com.example.itemly.ui.add.AddFragment
 import com.example.itemly.ui.favorite.FavoriteFragment
-import com.example.itemly.ui.myImage.MyImageFragment
+import com.example.itemly.ui.like.LikeFragment
 import com.example.itemly.ui.account.AccountFragment
 import com.example.itemly.ui.authorization.AuthFragment
 import com.example.itemly.ui.home.HomeFragment
@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity() {
                 Item.HOME -> openMainFragment("HOME", HomeFragment())
                 Item.FAVORITE -> openMainFragment("FAVORITE", FavoriteFragment())
                 Item.ADD -> openAddFragment()
-                Item.MY_IMAGE -> openMainFragment("MY_IMAGE", MyImageFragment())
+                Item.MY_IMAGE -> openMainFragment("MY_IMAGE", LikeFragment())
                 Item.ACCOUNT -> openMainFragment("ACCOUNT", AccountFragment())
             }
         }
