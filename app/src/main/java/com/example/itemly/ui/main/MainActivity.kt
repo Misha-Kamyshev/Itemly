@@ -253,7 +253,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openAddFragment() {
-        val addFragment = AddFragment()
+        val addFragment = AddFragment.newInstance(false)
         val transaction = supportFragmentManager.beginTransaction()
 
         supportFragmentManager.fragments.firstOrNull { it.isVisible }?.let { transaction.hide(it) }
