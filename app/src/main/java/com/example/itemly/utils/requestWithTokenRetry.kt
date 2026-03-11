@@ -10,21 +10,25 @@ suspend fun <T> requestWithTokenRetry(
     request: suspend (String) -> T
 ): T {
     val pref = context.getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-    var accessToken = pref.getString(PrefKeys.ACCESS_TOKEN, "")!!
+    val accessToken = pref.getString(PrefKeys.ACCESS_TOKEN, null)
+        ?: throw Exception("No access token")
 
     try {
         return request(accessToken)
 
     } catch (e: HttpException) {
-        if (e.code() == CodeToken.ERROR_TOKEN) {
-            val result = updateToken(context)
 
-            if (result == CodeToken.SUCCESSFUL) {
-                accessToken = pref.getString(PrefKeys.ACCESS_TOKEN, "")!!
-                return request(accessToken)
-            }
-        }
+        if (e.code() != 401)
+            throw e
 
-        throw e
+        val result = updateToken(context)
+
+        if (result != CodeToken.SUCCESSFUL)
+            throw e
+
+        val newToken = pref.getString(PrefKeys.ACCESS_TOKEN, null)
+            ?: throw Exception("Token refresh failed")
+
+        return request(newToken)
     }
 }

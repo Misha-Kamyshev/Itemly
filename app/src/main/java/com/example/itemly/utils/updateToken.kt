@@ -24,7 +24,7 @@ suspend fun updateToken(context: Context): Int {
 
 private suspend fun request(context: Context, refreshToken: String): Int {
     try {
-        val response = ApiClient.apiService.updateToken(refreshToken)
+        val response = ApiClient.apiService.updateToken("Bearer $refreshToken")
         saveToken(context, response)
 
         return CodeToken.SUCCESSFUL

@@ -21,10 +21,14 @@ import retrofit2.http.Query
 
 interface ApiService {
     @POST("user/signin")
-    suspend fun signIn(@Body request: DataAuthorizationPush): DataAuthorizationPull
+    suspend fun signIn(
+        @Body request: DataAuthorizationPush
+    ): DataAuthorizationPull
 
     @POST("user/signup")
-    suspend fun signUp(@Body request: DataRegistrationPush): DataAuthorizationPull
+    suspend fun signUp(
+        @Body request: DataRegistrationPush
+    ): DataAuthorizationPull
 
     @Multipart
     @POST("user/change_preview")
@@ -34,10 +38,14 @@ interface ApiService {
     ): Response<Unit>
 
     @POST("user/get_image_user")
-    suspend fun getImageUser(@Query("username") username: String): DataPreviewImageResponse
+    suspend fun getImageUser(
+        @Query("username") username: String
+    ): DataPreviewImageResponse
 
     @POST("user/update_token")
-    suspend fun updateToken(@Body refreshToken: String): DataAuthorizationPull
+    suspend fun updateToken(
+        @Header("Authorization") refreshToken: String
+    ): DataAuthorizationPull
 
     @POST("items/get_main")
     suspend fun getMain(
