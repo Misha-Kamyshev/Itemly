@@ -26,8 +26,10 @@ import com.example.itemly.R
 import com.example.itemly.data.api.ApiClient
 import com.example.itemly.data.api.ApiConstants
 import com.example.itemly.data.model.item.ItemDataSchema
-import com.example.itemly.data.model.item.ItemInformation
+import com.example.itemly.data.model.item.ItemInformationRequest
+import com.example.itemly.data.model.item.ItemInformationResponse
 import com.example.itemly.data.model.item.ItemRequest
+import com.example.itemly.data.objects.CodeToken
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentDetailImageBinding
 import com.example.itemly.ui.account.AccountAuthor
@@ -40,6 +42,7 @@ import com.example.itemly.ui.viewModel.FavoriteViewModel
 import com.example.itemly.ui.viewModel.DetailImageViewModel
 import com.example.itemly.utils.StaggeredGridSpacingItemDecoration
 import com.example.itemly.utils.subscribeDataForAdapter
+import com.example.itemly.utils.updateToken
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -49,8 +52,8 @@ class DetailImageFragment : Fragment() {
     private lateinit var data: ItemDataSchema
     private var _binding: FragmentDetailImageBinding? = null
     private val binding get() = _binding!!
-    private val favoriteViewModel: FavoriteViewModel by activityViewModels()
     private lateinit var username: String
+    private lateinit var accessToken: String
 
     companion object {
         private const val ARG_ITEM = "arg_item"
@@ -87,6 +90,7 @@ class DetailImageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
         username = pref.getString(PrefKeys.USERNAME, "")!!
+        accessToken = pref.getString(PrefKeys.ACCESS_TOKEN, "")!!
 
         setupAdapters()
     }
@@ -104,7 +108,6 @@ class DetailImageFragment : Fragment() {
                 username,
                 info,
                 viewLifecycleOwner,
-                favoriteViewModel,
                 onClickBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
                 onClickOther = { author, view -> onClickOther(author, view) },
                 onClickAuthor = {
@@ -144,13 +147,23 @@ class DetailImageFragment : Fragment() {
         }
     }
 
-    private suspend fun getInformation(): ItemInformation {
+    private suspend fun getInformation(): ItemInformationResponse {
         try {
-            return ApiClient.apiService.getInformation(data.id, username)
-        } catch (_: HttpException) {
-            httpToast(context)
-            requireActivity().onBackPressedDispatcher.onBackPressed()
-            throw CancellationException()
+            return ApiClient.apiService.getInformation(
+                ItemInformationRequest(
+                    data.id,
+                    username,
+                    accessToken
+                )
+            )
+        } catch (e: HttpException) {
+            if (e.code() == CodeToken.ERROR_TOKEN)
+                updateToken(requireContext())
+            else {
+                httpToast(context)
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+                throw CancellationException()
+            }
         } catch (_: IOException) {
             ioToast(context)
             requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -191,11 +204,15 @@ class DetailImageFragment : Fragment() {
     private fun onDeleteItem() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val response = ApiClient.apiService.deleteItem(ItemRequest(data.id, username))
+                val response =
+                    ApiClient.apiService.deleteItem(ItemRequest(data.id, username, accessToken))
                 if (response.isSuccessful) {
                     requireActivity().onBackPressedDispatcher.onBackPressed()
                 } else {
-                    httpToast(context)
+                    if (response.code() == CodeToken.ERROR_TOKEN)
+                        updateToken(requireContext())
+                    else
+                        httpToast(context)
                 }
             } catch (_: IOException) {
                 ioToast(context)

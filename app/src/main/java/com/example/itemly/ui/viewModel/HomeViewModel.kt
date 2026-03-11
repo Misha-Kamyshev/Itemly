@@ -6,13 +6,13 @@ import com.example.itemly.data.model.item.ItemsRequest
 import com.example.itemly.data.model.item.SearchRequest
 
 class HomeViewModel : BaseViewModel(
-    { username, lastId ->
+    { username, lastId, accessToken ->
         val query = SearchState.query
 
         if (query.isNullOrBlank()) {
-            ApiClient.apiService.getMain(ItemsRequest(username, lastId))
+            ApiClient.apiService.getMain(ItemsRequest(username, lastId, accessToken))
         } else {
-            ApiClient.apiService.searchItems(SearchRequest(query, lastId))
+            ApiClient.apiService.searchItems(SearchRequest(query, lastId, accessToken))
         }
     }
 ) {

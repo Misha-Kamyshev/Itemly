@@ -21,6 +21,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.itemly.R
 import com.example.itemly.data.api.ApiClient
+import com.example.itemly.data.model.item.AccessTokenRequest
+import com.example.itemly.data.objects.CodeToken
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentAddPhotoBinding
 import com.example.itemly.ui.components.httpToast
@@ -30,6 +32,7 @@ import com.example.itemly.ui.previewImage.PreviewImageFragment
 import com.example.itemly.utils.GridSpacingItemDecoration
 import com.example.itemly.utils.loadAlbums
 import com.example.itemly.utils.loadImagesFromAlbum
+import com.example.itemly.utils.updateToken
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -232,12 +235,14 @@ class AddFragment : Fragment() {
     private fun changePreviewPhoto() {
         val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
         val username = pref.getString(PrefKeys.USERNAME, "")!!
+        val accessToken = pref.getString(PrefKeys.ACCESS_TOKEN, "")!!
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val response = ApiClient.apiService.changePreview(
                     username.toRequestBody("text/plain".toMediaType()),
-                    getImage()
+                    getImage(),
+                    AccessTokenRequest(accessToken)
                 )
                 if (response.isSuccessful) {
                     Toast.makeText(
@@ -247,7 +252,10 @@ class AddFragment : Fragment() {
                     ).show()
                     requireActivity().onBackPressedDispatcher.onBackPressed()
                 } else {
-                    httpToast(requireContext())
+                    if (response.code() == CodeToken.ERROR_TOKEN)
+                        updateToken(requireContext())
+                    else
+                        httpToast(requireContext())
                 }
             } catch (_: IOException) {
                 ioToast(requireContext())

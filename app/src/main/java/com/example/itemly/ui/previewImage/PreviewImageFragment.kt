@@ -21,9 +21,12 @@ import androidx.core.view.setPadding
 import androidx.lifecycle.lifecycleScope
 import com.example.itemly.R
 import com.example.itemly.data.api.ApiClient
+import com.example.itemly.data.model.item.AccessTokenRequest
+import com.example.itemly.data.objects.CodeToken
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.ui.components.httpToast
 import com.example.itemly.ui.components.ioToast
+import com.example.itemly.utils.updateToken
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -168,6 +171,7 @@ class PreviewImageFragment : Fragment() {
         val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
 
         val username = pref.getString(PrefKeys.USERNAME, "")!!
+        val accessToken = pref.getString(PrefKeys.ACCESS_TOKEN, "")!!
         val name = getName()
         val tags = getTags()
         val bitmap = getImage()
@@ -185,18 +189,21 @@ class PreviewImageFragment : Fragment() {
         val tagsParts = tags.toRequestBody("text/plain".toMediaType())
         val imagePart = MultipartBody.Part.createFormData("image", "photo.jpg", requestFile)
 
-        publicPhoto(usernamePart, namePart, tagsParts, imagePart)
+        publicPhoto(usernamePart, namePart, tagsParts, imagePart, accessToken)
     }
 
     private fun publicPhoto(
         username: RequestBody,
         name: RequestBody,
         tags: RequestBody,
-        image: MultipartBody.Part
+        image: MultipartBody.Part,
+        accessToken: String
     ) {
         lifecycleScope.launch {
             try {
-                val response = ApiClient.apiService.addItem(username, name, tags, image)
+                val response = ApiClient.apiService.addItem(
+                    username, name, tags, image, AccessTokenRequest(accessToken)
+                )
                 if (response.isSuccessful) {
                     Toast.makeText(
                         requireContext(),
@@ -206,7 +213,10 @@ class PreviewImageFragment : Fragment() {
                     backCallback.isEnabled = false
                     requireActivity().onBackPressedDispatcher.onBackPressed()
                 } else {
-                    httpToast(requireContext())
+                    if (response.code() == CodeToken.ERROR_TOKEN)
+                        updateToken(requireContext())
+                    else
+                        httpToast(requireContext())
                 }
             } catch (_: IOException) {
                 ioToast(requireContext())

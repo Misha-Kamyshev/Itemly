@@ -4,7 +4,7 @@ import com.example.itemly.data.api.ApiClient
 import com.example.itemly.data.model.item.ItemsRequest
 
 class AccountViewModel : BaseViewModel(
-    { username, lastId ->
-        ApiClient.apiService.getMyImage(ItemsRequest(username, lastId))
+    { username, lastId, accessToken ->
+        ApiClient.apiService.getMyImage(ItemsRequest(username, lastId, accessToken))
     }
 )

@@ -17,12 +17,15 @@ import com.example.itemly.R
 import com.example.itemly.data.api.ApiClient
 import com.example.itemly.data.api.ApiConstants
 import com.example.itemly.data.model.item.ItemDataSchema
-import com.example.itemly.data.model.item.ItemInformation
+import com.example.itemly.data.model.item.ItemInformationResponse
 import com.example.itemly.data.model.item.ItemRequest
+import com.example.itemly.data.objects.CodeToken
+import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.BlockDetailHeaderBinding
 import com.example.itemly.ui.components.httpToast
 import com.example.itemly.ui.components.ioToast
 import com.example.itemly.ui.viewModel.FavoriteViewModel
+import com.example.itemly.utils.updateToken
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -32,9 +35,8 @@ import java.io.IOException
 class AdapterDetail(
     private val data: ItemDataSchema,
     private val username: String,
-    private val info: ItemInformation,
+    private val info: ItemInformationResponse,
     private val lifecycleOwner: LifecycleOwner,
-    private val favoriteViewModel: FavoriteViewModel,
     private val onClickBack: () -> Unit,
     private val onClickOther: (String, View) -> Unit,
     private val onClickAuthor: (String) -> Unit,
@@ -42,6 +44,7 @@ class AdapterDetail(
 ) : RecyclerView.Adapter<AdapterDetail.ViewHolder>() {
     private val saveItem = MutableLiveData(false)
     private val countLike = MutableLiveData(0)
+    private lateinit var accessToken: String
 
     class ViewHolder(
         val binding: BlockDetailHeaderBinding
@@ -61,6 +64,9 @@ class AdapterDetail(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val binding = holder.binding
         val context = binding.root.context
+
+        val pref = context.getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
+        accessToken = pref.getString(PrefKeys.ACCESS_TOKEN, "")!!
 
         Glide.with(context)
             .load(ApiConstants.BASE_URL + data.imageUrl)
@@ -87,7 +93,7 @@ class AdapterDetail(
 
         loadInformation(binding, adapterTags)
         binding.includeBlockTagsDetailImageFragment.apply {
-            imageLike.setOnClickListener { onClickLike(imageLike) }
+            imageLike.setOnClickListener { onClickLike(imageLike, binding.root.context) }
             blockAuthor.setOnClickListener { onClickAuthor(info.author) }
             buttonGoToAuthor.setOnClickListener { onClickAuthor(info.author) }
         }
@@ -167,28 +173,34 @@ class AdapterDetail(
         }
     }
 
-    private fun onClickLike(imageLike: ImageView) {
+    private fun onClickLike(imageLike: ImageView, context: Context) {
         val isSelected = imageLike.isSelected
 
         lifecycleOwner.lifecycleScope.launch {
             try {
                 if (!isSelected) {
                     val response =
-                        ApiClient.apiService.addLike(ItemRequest(data.id, username))
+                        ApiClient.apiService.addLike(ItemRequest(data.id, username, accessToken))
                     if (response.isSuccessful) {
                         countLike.value = countLike.value!! + 1
                         imageLike.isSelected = true
                     } else {
-                        httpToast(imageLike.context)
+                        if (response.code() == CodeToken.ERROR_TOKEN)
+                            updateToken(context)
+                        else
+                            httpToast(imageLike.context)
                     }
                 } else {
                     val response =
-                        ApiClient.apiService.deleteLike(ItemRequest(data.id, username))
+                        ApiClient.apiService.deleteLike(ItemRequest(data.id, username, accessToken))
                     if (response.isSuccessful) {
                         countLike.value = countLike.value!! - 1
                         imageLike.isSelected = false
                     } else {
-                        httpToast(imageLike.context)
+                        if (response.code() == CodeToken.ERROR_TOKEN)
+                            updateToken(context)
+                        else
+                            httpToast(imageLike.context)
                     }
                 }
             } catch (_: IOException) {
@@ -201,19 +213,32 @@ class AdapterDetail(
         lifecycleOwner.lifecycleScope.launch {
             try {
                 if (save) {
-                    val response = ApiClient.apiService.saveItem(ItemRequest(data.id, username))
+                    val response =
+                        ApiClient.apiService.saveItem(ItemRequest(data.id, username, accessToken))
                     if (response.isSuccessful) {
                         saveItem.value = true
                     } else {
-                        httpToast(context)
+                        if (response.code() == CodeToken.ERROR_TOKEN)
+                            updateToken(context)
+                        else
+                            httpToast(context)
                     }
                 } else {
                     val response =
-                        ApiClient.apiService.deleteFavoriteItem(ItemRequest(data.id, username))
+                        ApiClient.apiService.deleteFavoriteItem(
+                            ItemRequest(
+                                data.id,
+                                username,
+                                accessToken
+                            )
+                        )
                     if (response.isSuccessful) {
                         saveItem.value = false
                     } else {
-                        httpToast(context)
+                        if (response.code() == CodeToken.ERROR_TOKEN)
+                            updateToken(context)
+                        else
+                            httpToast(context)
                     }
                 }
             } catch (_: IOException) {

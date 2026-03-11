@@ -3,7 +3,9 @@ package com.example.itemly.data.api
 import com.example.itemly.data.model.authorization.DataAuthorizationPull
 import com.example.itemly.data.model.authorization.DataAuthorizationPush
 import com.example.itemly.data.model.authorization.DataRegistrationPush
-import com.example.itemly.data.model.item.ItemInformation
+import com.example.itemly.data.model.item.AccessTokenRequest
+import com.example.itemly.data.model.item.ItemInformationResponse
+import com.example.itemly.data.model.item.ItemInformationRequest
 import com.example.itemly.data.model.item.ItemRequest
 import com.example.itemly.data.model.item.ItemSimilarRequest
 import com.example.itemly.data.model.item.ItemsData
@@ -37,10 +39,7 @@ interface ApiService {
     suspend fun getMain(@Body request: ItemsRequest): ItemsData
 
     @GET("items/get_information")
-    suspend fun getInformation(
-        @Query("id_item") id: Int,
-        @Query("username") username: String
-    ): ItemInformation
+    suspend fun getInformation(@Body request: ItemInformationRequest): ItemInformationResponse
 
     @POST("items/add_like")
     suspend fun addLike(@Body request: ItemRequest): Response<Unit>
@@ -54,14 +53,16 @@ interface ApiService {
         @Part("username") username: RequestBody,
         @Part("name_item") nameItem: RequestBody,
         @Part("tags") tags: RequestBody,
-        @Part image: MultipartBody.Part
+        @Part image: MultipartBody.Part,
+        @Body request: AccessTokenRequest
     ): Response<Unit>
 
     @Multipart
     @POST("user/change_preview")
     suspend fun changePreview(
         @Part("username") username: RequestBody,
-        @Part image: MultipartBody.Part
+        @Part image: MultipartBody.Part,
+        @Body request: AccessTokenRequest
     ): Response<Unit>
 
     @POST("items/get_favorite")
