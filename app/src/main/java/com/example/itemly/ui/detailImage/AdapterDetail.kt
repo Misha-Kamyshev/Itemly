@@ -16,16 +16,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.itemly.R
 import com.example.itemly.data.api.ApiClient
 import com.example.itemly.data.api.ApiConstants
-import com.example.itemly.data.model.item.ItemDataSchema
+import com.example.itemly.data.model.item.ItemData
 import com.example.itemly.data.model.item.ItemInformationResponse
-import com.example.itemly.data.model.item.ItemRequest
-import com.example.itemly.data.objects.CodeToken
 import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.BlockDetailHeaderBinding
 import com.example.itemly.ui.components.httpToast
 import com.example.itemly.ui.components.ioToast
-import com.example.itemly.ui.viewModel.FavoriteViewModel
-import com.example.itemly.utils.updateToken
+import com.example.itemly.utils.requestWithTokenRetry
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -33,8 +30,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 
 class AdapterDetail(
-    private val data: ItemDataSchema,
-    private val username: String,
+    private val data: ItemData,
     private val info: ItemInformationResponse,
     private val lifecycleOwner: LifecycleOwner,
     private val onClickBack: () -> Unit,
@@ -178,30 +174,24 @@ class AdapterDetail(
 
         lifecycleOwner.lifecycleScope.launch {
             try {
-                if (!isSelected) {
-                    val response =
-                        ApiClient.apiService.addLike(ItemRequest(data.id, username, accessToken))
-                    if (response.isSuccessful) {
+                val response = requestWithTokenRetry(context) { token ->
+                    if (!isSelected) {
+                        ApiClient.apiService.addLike(data.id, "Bearer $token")
+                    } else {
+                        ApiClient.apiService.deleteLike(data.id, "Bearer $token")
+                    }
+                }
+
+                if (response.isSuccessful) {
+                    if (!isSelected) {
                         countLike.value = countLike.value!! + 1
                         imageLike.isSelected = true
                     } else {
-                        if (response.code() == CodeToken.ERROR_TOKEN)
-                            updateToken(context)
-                        else
-                            httpToast(imageLike.context)
-                    }
-                } else {
-                    val response =
-                        ApiClient.apiService.deleteLike(ItemRequest(data.id, username, accessToken))
-                    if (response.isSuccessful) {
                         countLike.value = countLike.value!! - 1
                         imageLike.isSelected = false
-                    } else {
-                        if (response.code() == CodeToken.ERROR_TOKEN)
-                            updateToken(context)
-                        else
-                            httpToast(imageLike.context)
                     }
+                } else {
+                    httpToast(imageLike.context)
                 }
             } catch (_: IOException) {
                 ioToast(imageLike.context)
@@ -212,34 +202,18 @@ class AdapterDetail(
     private fun saveItem(save: Boolean, context: Context) {
         lifecycleOwner.lifecycleScope.launch {
             try {
-                if (save) {
-                    val response =
-                        ApiClient.apiService.saveItem(ItemRequest(data.id, username, accessToken))
-                    if (response.isSuccessful) {
-                        saveItem.value = true
+                val response = requestWithTokenRetry(context) { token ->
+                    if (save) {
+                        ApiClient.apiService.saveItem(data.id, "Bearer $token")
                     } else {
-                        if (response.code() == CodeToken.ERROR_TOKEN)
-                            updateToken(context)
-                        else
-                            httpToast(context)
+                        ApiClient.apiService.deleteFavoriteItem(data.id, "Bearer $token")
                     }
+                }
+
+                if (response.isSuccessful) {
+                    saveItem.value = save
                 } else {
-                    val response =
-                        ApiClient.apiService.deleteFavoriteItem(
-                            ItemRequest(
-                                data.id,
-                                username,
-                                accessToken
-                            )
-                        )
-                    if (response.isSuccessful) {
-                        saveItem.value = false
-                    } else {
-                        if (response.code() == CodeToken.ERROR_TOKEN)
-                            updateToken(context)
-                        else
-                            httpToast(context)
-                    }
+                    httpToast(context)
                 }
             } catch (_: IOException) {
                 ioToast(context)

@@ -1,6 +1,5 @@
 package com.example.itemly.ui.like
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentLikeBinding
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.detailImage.DetailImageFragment
@@ -37,7 +35,7 @@ class LikeFragment : Fragment() {
 
         setupRecycler()
         binding.swipeRefreshLike.setOnRefreshListener {
-            refresh()
+            viewModel.refresh(requireContext())
             binding.swipeRefreshLike.isRefreshing = false
         }
     }
@@ -66,12 +64,5 @@ class LikeFragment : Fragment() {
             viewLifecycleOwner,
             viewModel
         )
-    }
-
-    private fun refresh() {
-        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-        val username = pref.getString(PrefKeys.USERNAME, "")!!
-
-        viewModel.refresh(username, requireContext())
     }
 }

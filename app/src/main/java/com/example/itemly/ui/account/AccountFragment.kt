@@ -154,7 +154,7 @@ class AccountFragment : Fragment() {
     private fun refreshPage() {
         viewLifecycleOwner.lifecycleScope.launch {
             loadAvatar()
-            viewModel.refresh(username, requireContext())
+            viewModel.refresh(requireContext())
         }
     }
 

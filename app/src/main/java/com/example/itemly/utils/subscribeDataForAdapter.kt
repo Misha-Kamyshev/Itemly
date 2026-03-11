@@ -3,7 +3,6 @@ package com.example.itemly.utils
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.itemly.data.objects.PrefKeys
 import androidx.lifecycle.LifecycleOwner
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.viewModel.BaseViewModel
@@ -16,9 +15,6 @@ fun subscribeDataForAdapter(
     viewLifecycleOwner: LifecycleOwner,
     viewModel: BaseViewModel
 ) {
-    val pref = context.getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-    val username = pref.getString(PrefKeys.USERNAME, "")!!
-
     recycler.addOnScrollListener(object :
         RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -28,7 +24,7 @@ fun subscribeDataForAdapter(
             val lastVisibleItem = lastVisibleItems.maxOrNull() ?: 0
 
             if (lastVisibleItem + 5 >= totalItemCount) {
-                viewModel.loadNextPage(username, context)
+                viewModel.loadNextPage(context)
             }
         }
     })
@@ -40,5 +36,5 @@ fun subscribeDataForAdapter(
             adapter.submitList(items.toMutableList())
         }
     }
-    viewModel.loadFirstPage(username, context)
+    viewModel.loadFirstPage(context)
 }

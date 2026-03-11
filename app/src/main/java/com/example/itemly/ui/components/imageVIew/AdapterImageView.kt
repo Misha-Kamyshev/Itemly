@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.itemly.R
 import com.example.itemly.data.api.ApiConstants
-import com.example.itemly.data.model.item.ItemDataSchema
+import com.example.itemly.data.model.item.ItemData
 
 class AdapterImageView(
-    private val data: MutableList<ItemDataSchema>,
-    private val onClickItem: (item: ItemDataSchema) -> Unit
+    private val data: MutableList<ItemData>,
+    private val onClickItem: (item: ItemData) -> Unit
 ) :
     RecyclerView.Adapter<AdapterImageView.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -37,7 +37,7 @@ class AdapterImageView(
 
     override fun getItemCount(): Int = data.size
 
-    fun submitList(list: List<ItemDataSchema>, clear: Boolean = false) {
+    fun submitList(list: List<ItemData>, clear: Boolean = false) {
         if (clear) {
             data.clear()
             data.addAll(list)

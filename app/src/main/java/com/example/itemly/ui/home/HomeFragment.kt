@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.FragmentHomeBinding
 import com.example.itemly.ui.components.imageVIew.AdapterImageView
 import com.example.itemly.ui.detailImage.DetailImageFragment
@@ -49,7 +48,7 @@ class HomeFragment : Fragment() {
         setupBackPressed()
 
         binding.swipeRefreshHome.setOnRefreshListener {
-            refresh()
+            viewModel.refresh(requireContext())
             binding.swipeRefreshHome.isRefreshing = false
         }
     }
@@ -97,8 +96,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupSearchDebounce() {
-        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-        val username = pref.getString(PrefKeys.USERNAME, "")!!
         binding.editSearch.apply {
             addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
@@ -120,9 +117,9 @@ class HomeFragment : Fragment() {
                         val query = s.toString()
 
                         if (query.isBlank()) {
-                            viewModel.clearSearch(username, requireContext())
+                            viewModel.clearSearch(requireContext())
                         } else {
-                            viewModel.startSearch(username, query, requireContext())
+                            viewModel.startSearch(query, requireContext())
                         }
                     }
                 }
@@ -157,12 +154,5 @@ class HomeFragment : Fragment() {
                 isEnabled = true
             }
         }
-    }
-
-    private fun refresh() {
-        val pref = requireContext().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-        val username = pref.getString(PrefKeys.USERNAME, "")!!
-
-        viewModel.refresh(username, requireContext())
     }
 }
