@@ -75,14 +75,15 @@ class AccountFragment : Fragment() {
         }
 
         binding.layoutSetting.apply {
-            root.setOnClickListener { closeSetting() }
-            icClose.setOnClickListener { closeSetting() }
+            root.setOnClickListener { saveSettingState(false) }
+            icClose.setOnClickListener { saveSettingState(false) }
             blockSetting.setOnClickListener {}
 
             changeTheme.setOnClickListener { changeTheme() }
             logoutAccount.setOnClickListener {
                 logout(requireContext())
                 (activity as? MainActivity)?.logoutAccount()
+                restoreSettingState()
             }
         }
     }
@@ -114,7 +115,7 @@ class AccountFragment : Fragment() {
             iconAccountUrl = null,
             userAuthor = false,
             onClickPreviewPhoto = { onClickPreviewAccount() },
-            onClickSetting = { setupSetting() }
+            onClickSetting = { saveSettingState(true) }
         )
 
         val concatAdapter = ConcatAdapter(headerAdapter, adapterItem)
@@ -157,6 +158,8 @@ class AccountFragment : Fragment() {
         }
     }
 
+
+    // TODO Сделать чтобы при запуске приложения сбрасывалось состояние настроек
     private fun applySavedTheme() {
         val pref = requireContext().getSharedPreferences(PREF_SETTING, Context.MODE_PRIVATE)
 
@@ -177,22 +180,14 @@ class AccountFragment : Fragment() {
         }
     }
 
-    private fun setupSetting() {
-        binding.layoutSetting.root.visibility = View.VISIBLE
-        saveSettingState(true)
-    }
-
-    private fun closeSetting() {
-        binding.layoutSetting.root.visibility = View.GONE
-        saveSettingState(false)
-    }
-
     private fun saveSettingState(isVisible: Boolean) {
         requireContext()
             .getSharedPreferences(PREF_SETTING, Context.MODE_PRIVATE)
             .edit {
                 putBoolean(PREF_SETTING_VISIBLE, isVisible)
             }
+        binding.layoutSetting.root.visibility =
+            if (isVisible) View.VISIBLE else View.GONE
     }
 
     private fun restoreSettingState() {
