@@ -176,13 +176,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun clearBackStack(clearMain: Boolean) {
-        if (navigateViewModel.detailStack.isEmpty()) return
-
         val transaction = supportFragmentManager.beginTransaction()
-
-        navigateViewModel.detailStack.forEach { fragment ->
-            transaction.remove(fragment)
-        }
 
         if (clearMain) {
             navigateViewModel.mainStack.forEach { tag ->
@@ -190,15 +184,18 @@ class MainActivity : AppCompatActivity() {
                     transaction.remove(it)
                 }
             }
+            navigateViewModel.mainStack.clear()
+
+        }
+
+        if (navigateViewModel.detailStack.isEmpty()) return
+
+        navigateViewModel.detailStack.forEach { fragment ->
+            transaction.remove(fragment)
         }
 
         transaction.commitNow()
-
         navigateViewModel.detailStack.clear()
-        if (clearMain) {
-            navigateViewModel.mainStack.clear()
-        }
-
         binding.bottomBar.visibility = View.VISIBLE
     }
 
@@ -265,17 +262,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onLoginSuccess() {
-        clearBackStack(true)
-
         openMainFragment("HOME", HomeFragment())
+
+        clearBackStack(true)
 
         visibilityBottomBar(true)
     }
 
     fun logoutAccount() {
         logout(this)
-        clearBackStack(true)
         openMainFragment("AUTHORIZATION", AuthFragment())
+        clearBackStack(true)
         visibilityBottomBar(false)
     }
 }
