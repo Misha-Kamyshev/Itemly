@@ -170,7 +170,8 @@ class DetailImageFragment : Fragment() {
                         .setTitle("Вы уверены?")
                         .setMessage("Вы точно хотите удалить изображение для всех?")
                         .setPositiveButton("Да") { dialog, _ -> dialog.dismiss(); onDeleteItem() }
-                        .setNeutralButton("Нет", null)
+                        .setNegativeButton("Нет", null)
+                        .show()
                     true
                 }
 

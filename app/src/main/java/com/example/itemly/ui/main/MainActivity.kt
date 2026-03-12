@@ -101,8 +101,7 @@ class MainActivity : AppCompatActivity() {
 
         transaction.commitNow()
 
-        binding.bottomBar.visibility =
-            if (navigateViewModel.detailStack.isEmpty()) View.VISIBLE else View.GONE
+        visibilityBottomBar(navigateViewModel.detailStack.isEmpty())
     }
 
     // Настройка BottomBar
@@ -118,6 +117,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun syncBottomBarSelection(tag: String? = navigateViewModel.mainStack.lastOrNull()) {
+        when (tag) {
+            "HOME" -> binding.bottomBar.select(Item.HOME)
+            "FAVORITE" -> binding.bottomBar.select(Item.FAVORITE)
+            "MY_IMAGE" -> binding.bottomBar.select(Item.MY_IMAGE)
+            "ACCOUNT" -> binding.bottomBar.select(Item.ACCOUNT)
+        }
+    }
+
+    fun visibilityBottomBar(visible: Boolean) {
+        binding.bottomBar.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    // Работа с возвратом назад
     private fun handleBack(): Boolean {
         if (navigateViewModel.detailStack.isNotEmpty()) {
             val fragment =
@@ -130,8 +143,7 @@ class MainActivity : AppCompatActivity() {
                 )
             prev?.let { supportFragmentManager.beginTransaction().show(it).commitNow() }
 
-            binding.bottomBar.visibility =
-                if (navigateViewModel.detailStack.isEmpty()) View.VISIBLE else View.GONE
+            visibilityBottomBar(navigateViewModel.detailStack.isEmpty())
 
             if (navigateViewModel.detailStack.isEmpty()) syncBottomBarSelection(navigateViewModel.mainStack.lastOrNull())
             return true
@@ -164,16 +176,7 @@ class MainActivity : AppCompatActivity() {
 
         transaction.commitNow()
         navigateViewModel.detailStack.clear()
-        binding.bottomBar.visibility = View.VISIBLE
-    }
-
-    private fun syncBottomBarSelection(tag: String? = navigateViewModel.mainStack.lastOrNull()) {
-        when (tag) {
-            "HOME" -> binding.bottomBar.select(Item.HOME)
-            "FAVORITE" -> binding.bottomBar.select(Item.FAVORITE)
-            "MY_IMAGE" -> binding.bottomBar.select(Item.MY_IMAGE)
-            "ACCOUNT" -> binding.bottomBar.select(Item.ACCOUNT)
-        }
+        visibilityBottomBar(true)
     }
 
     // Управление фрагментами
@@ -226,7 +229,7 @@ class MainActivity : AppCompatActivity() {
         transaction.add(binding.containerFragment.id, addFragment, "ADD_FRAGMENT").commit()
         navigateViewModel.detailStack.add(addFragment)
 
-        binding.bottomBar.visibility = View.GONE
+        visibilityBottomBar(false)
     }
 
     fun logoutAccount() {
