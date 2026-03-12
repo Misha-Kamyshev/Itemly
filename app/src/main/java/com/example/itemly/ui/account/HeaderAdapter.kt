@@ -19,15 +19,20 @@ class HeaderAdapter(
     private var iconAccountUrl: String?,
     private val userAuthor: Boolean,
     private val onClickPreviewPhoto: () -> Unit,
-    private val onClickSetting: () -> Unit = {}
+    private val onClickLogout: () -> Unit = {},
+    private val onClickChangeTheme: () -> Unit = {}
 ) : RecyclerView.Adapter<HeaderAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val username: MaterialTextView = view.findViewById(R.id.usernameAccount)
         val email: MaterialTextView = view.findViewById(R.id.emailAccount)
         val icon: ImageView = view.findViewById(R.id.iconAccount)
         val image: ImageView = view.findViewById(R.id.imageAccount)
-        val buttonSetting: MaterialCardView = view.findViewById(R.id.buttonSettingsAccount)
+        val buttonLogout: MaterialCardView = view.findViewById(R.id.buttonLogoutAccount)
+        val buttonChangeTheme: MaterialCardView = view.findViewById(R.id.buttonChangeThemeAccount)
+        val imageTheme: ImageView = view.findViewById(R.id.imageThemeAccount)
     }
+
+    private var themeIcon: Int = R.drawable.ic_setting
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -64,12 +69,15 @@ class HeaderAdapter(
         holder.icon.setOnClickListener { onClickPreviewPhoto() }
 
         if (userAuthor) {
-            holder.buttonSetting.visibility = View.GONE
+            holder.buttonLogout.visibility = View.GONE
+            holder.buttonChangeTheme.visibility = View.GONE
         } else {
-            holder.buttonSetting.visibility = View.VISIBLE
-            holder.buttonSetting.setOnClickListener {
-                onClickSetting()
-            }
+            holder.imageTheme.setImageResource(themeIcon)
+            holder.buttonChangeTheme.visibility = View.VISIBLE
+            holder.buttonChangeTheme.setOnClickListener { onClickChangeTheme() }
+
+            holder.buttonLogout.visibility = View.VISIBLE
+            holder.buttonLogout.setOnClickListener { onClickLogout() }
         }
     }
 
@@ -86,5 +94,10 @@ class HeaderAdapter(
 
     fun updateIcon(newIcon: String?) {
         iconAccountUrl = newIcon
+    }
+
+    fun updateThemeIcon(resId: Int) {
+        this.themeIcon = resId
+        notifyItemChanged(0)
     }
 }

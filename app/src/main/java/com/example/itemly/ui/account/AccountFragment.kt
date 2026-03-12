@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -22,17 +23,19 @@ import com.example.itemly.ui.detailImage.DetailImageFragment
 import com.example.itemly.ui.main.MainActivity
 import com.example.itemly.ui.viewModel.AccountViewModel
 import com.example.itemly.utils.StaggeredGridSpacingItemDecoration
-import com.example.itemly.utils.logout
 import com.example.itemly.utils.subscribeDataForAdapter
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 import androidx.core.content.edit
+import com.example.itemly.R
 
 class AccountFragment : Fragment() {
+
     private var _binding: FragmentAccountBinding? = null
     private val binding get() = _binding!!
     private val viewModel: AccountViewModel by activityViewModels()
+
     private lateinit var username: String
     private lateinit var email: String
     private lateinit var headerAdapter: HeaderAdapter
@@ -44,11 +47,7 @@ class AccountFragment : Fragment() {
         private const val PREF_SETTING_VISIBLE = "pref_setting_visible"
     }
 
-    enum class ThemeMode {
-        SYSTEM,
-        DARK,
-        LIGHT
-    }
+    enum class ThemeMode { SYSTEM, DARK, LIGHT }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,44 +60,19 @@ class AccountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val pref = requireActivity().getSharedPreferences(PrefKeys.PREF_USER, Context.MODE_PRIVATE)
-        username = pref.getString(PrefKeys.USERNAME, "")!!
-        email = pref.getString(PrefKeys.E_MAIL, "")!!
+        username = pref.getString(PrefKeys.USERNAME, "") ?: ""
+        email = pref.getString(PrefKeys.E_MAIL, "") ?: ""
 
         setupAdapter()
         applySavedTheme()
-        restoreSettingState()
 
         binding.swipeRefreshAccount.setOnRefreshListener {
             refreshPage()
             binding.swipeRefreshAccount.isRefreshing = false
         }
 
-        binding.layoutSetting.apply {
-            root.setOnClickListener { saveSettingState(false) }
-            icClose.setOnClickListener { saveSettingState(false) }
-            blockSetting.setOnClickListener {}
-
-            changeTheme.setOnClickListener { changeTheme() }
-            logoutAccount.setOnClickListener {
-                logout(requireContext())
-                (activity as MainActivity).logoutAccount()
-                restoreSettingState()
-            }
-        }
-    }
-
-    private suspend fun getIconAccount(): String? {
-        return try {
-            val response = ApiClient.apiService.getImageUser(username)
-            response.pathPreview
-        } catch (_: HttpException) {
-            httpToast(requireContext())
-            null
-        } catch (_: IOException) {
-            ioToast(requireContext())
-            null
-        }
     }
 
     private fun setupAdapter() {
@@ -115,15 +89,15 @@ class AccountFragment : Fragment() {
             iconAccountUrl = null,
             userAuthor = false,
             onClickPreviewPhoto = { onClickPreviewAccount() },
-            onClickSetting = { saveSettingState(true) }
+            onClickLogout = { (activity as MainActivity).logoutAccount() },
+            onClickChangeTheme = { changeTheme() }
         )
 
         val concatAdapter = ConcatAdapter(headerAdapter, adapterItem)
-
         binding.recyclerAccount.apply {
-            this.adapter = concatAdapter
-            this.layoutManager = layout
-            this.addItemDecoration(StaggeredGridSpacingItemDecoration(2, 10, true))
+            adapter = concatAdapter
+            layoutManager = layout
+            addItemDecoration(StaggeredGridSpacingItemDecoration(2, 10, true))
         }
 
         subscribeDataForAdapter(
@@ -145,10 +119,17 @@ class AccountFragment : Fragment() {
     private fun loadAvatar() {
         viewLifecycleOwner.lifecycleScope.launch {
             val icon = getIconAccount()
-
             headerAdapter.updateIcon(icon)
             headerAdapter.notifyItemChanged(0)
         }
+    }
+
+    private suspend fun getIconAccount(): String? = try {
+        ApiClient.apiService.getImageUser(username).pathPreview
+    } catch (_: HttpException) {
+        httpToast(requireContext()); null
+    } catch (_: IOException) {
+        ioToast(requireContext()); null
     }
 
     private fun refreshPage() {
@@ -158,53 +139,21 @@ class AccountFragment : Fragment() {
         }
     }
 
-
-    // TODO Сделать чтобы при запуске приложения сбрасывалось состояние настроек
+    // --------------------- НАСТРОЙКИ ---------------------
     private fun applySavedTheme() {
         val pref = requireContext().getSharedPreferences(PREF_SETTING, Context.MODE_PRIVATE)
+        val themeStr = pref.getString(PREF_THEME, ThemeMode.SYSTEM.name)
+        val theme = ThemeMode.values().find { it.name == themeStr } ?: ThemeMode.SYSTEM
 
-        val theme = ThemeMode.valueOf(
-            pref.getString(PREF_THEME, ThemeMode.SYSTEM.name)!!
-        )
-
-        when (theme) {
-            ThemeMode.SYSTEM -> {
-                binding.layoutSetting.changeTheme.text = "Системная"
-            }
-            ThemeMode.DARK -> {
-                binding.layoutSetting.changeTheme.text = "Тёмная"
-            }
-            ThemeMode.LIGHT -> {
-                binding.layoutSetting.changeTheme.text = "Светлая"
-            }
-        }
+        headerAdapter.updateThemeIcon(getThemeIcon(theme))
     }
 
-    private fun saveSettingState(isVisible: Boolean) {
-        requireContext()
-            .getSharedPreferences(PREF_SETTING, Context.MODE_PRIVATE)
-            .edit {
-                putBoolean(PREF_SETTING_VISIBLE, isVisible)
-            }
-        binding.layoutSetting.root.visibility =
-            if (isVisible) View.VISIBLE else View.GONE
-    }
-
-    private fun restoreSettingState() {
-        val pref = requireContext()
-            .getSharedPreferences(PREF_SETTING, Context.MODE_PRIVATE)
-
-        val visible = pref.getBoolean(PREF_SETTING_VISIBLE, false)
-
-        binding.layoutSetting.root.visibility =
-            if (visible) View.VISIBLE else View.GONE
-    }
-
-    fun changeTheme() {
+    private fun changeTheme() {
         val pref = requireContext().getSharedPreferences(PREF_SETTING, Context.MODE_PRIVATE)
-        val current = ThemeMode.valueOf(
-            pref.getString(PREF_THEME, ThemeMode.SYSTEM.name)!!
-        )
+
+        val current =
+            ThemeMode.values().find { it.name == pref.getString(PREF_THEME, ThemeMode.SYSTEM.name) }
+                ?: ThemeMode.SYSTEM
 
         val next = when (current) {
             ThemeMode.SYSTEM -> ThemeMode.DARK
@@ -215,26 +164,19 @@ class AccountFragment : Fragment() {
         pref.edit { putString(PREF_THEME, next.name) }
 
         when (next) {
-            ThemeMode.SYSTEM -> {
-                AppCompatDelegate.setDefaultNightMode(
-                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                )
-                binding.layoutSetting.changeTheme.text = "Системная"
-            }
+            ThemeMode.SYSTEM -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            ThemeMode.DARK -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            ThemeMode.LIGHT -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
 
-            ThemeMode.DARK -> {
-                AppCompatDelegate.setDefaultNightMode(
-                    AppCompatDelegate.MODE_NIGHT_YES
-                )
-                binding.layoutSetting.changeTheme.text = "Тёмная"
-            }
+        headerAdapter.updateThemeIcon(getThemeIcon(next))
+    }
 
-            ThemeMode.LIGHT -> {
-                AppCompatDelegate.setDefaultNightMode(
-                    AppCompatDelegate.MODE_NIGHT_NO
-                )
-                binding.layoutSetting.changeTheme.text = "Светлая"
-            }
+    private fun getThemeIcon(theme: ThemeMode): Int {
+        return when (theme) {
+            ThemeMode.DARK -> R.drawable.ic_moon
+            ThemeMode.LIGHT -> R.drawable.ic_sun
+            ThemeMode.SYSTEM -> R.drawable.ic_setting
         }
     }
 }
