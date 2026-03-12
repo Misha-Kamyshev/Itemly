@@ -1,9 +1,11 @@
 package com.example.itemly.ui.authorization
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -12,7 +14,7 @@ import com.example.itemly.R
 import com.example.itemly.data.model.DataSpanConfig
 import com.example.itemly.data.model.authorization.DataRegistrationPush
 import com.example.itemly.databinding.FragmentRegBinding
-import com.example.itemly.ui.main.MainActivity
+import com.example.itemly.ui.main.AuthActivity
 import com.example.itemly.utils.buildColoredSpannable
 import com.example.itemly.utils.nextFocus
 import com.example.itemly.utils.saveToken
@@ -38,7 +40,7 @@ class RegFragment : Fragment() {
 
         binding.buttonSignUp.setOnClickListener { onClickButtonSingUp() }
         binding.hrefSignIn.setOnClickListener {
-            (requireActivity() as MainActivity).openMainFragment("AUTHORIZATION", AuthFragment())
+            (requireActivity() as AuthActivity).openFragment("AUTHORIZATION", AuthFragment())
         }
         binding.errorSignUpTextView.visibility = View.GONE
 
@@ -107,7 +109,11 @@ class RegFragment : Fragment() {
                 binding.editPasswordSignUp.setText("")
                 binding.editPasswordSecondSignUp.setText("")
 
-                (requireActivity() as MainActivity).onLoginSuccess()
+                val imm =
+                    requireView().context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(requireView().windowToken, 0)
+
+                (requireActivity() as AuthActivity).startMain()
             } catch (_: HttpException) {
                 binding.errorSignUpTextView.text = "Ошибка сервера, попробуйте позже"
                 binding.errorSignUpTextView.visibility = View.VISIBLE

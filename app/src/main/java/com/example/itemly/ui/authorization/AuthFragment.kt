@@ -1,10 +1,12 @@
 package com.example.itemly.ui.authorization
 
+import android.content.Context
 import retrofit2.HttpException
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -13,7 +15,7 @@ import com.example.itemly.R
 import com.example.itemly.data.model.DataSpanConfig
 import com.example.itemly.data.model.authorization.DataAuthorizationPush
 import com.example.itemly.databinding.FragmentAuthBinding
-import com.example.itemly.ui.main.MainActivity
+import com.example.itemly.ui.main.AuthActivity
 import com.example.itemly.utils.buildColoredSpannable
 import com.example.itemly.utils.nextFocus
 import com.example.itemly.utils.saveToken
@@ -38,7 +40,7 @@ class AuthFragment : Fragment() {
 
         binding.buttonSignIn.setOnClickListener { onClickButtonSignIn() }
         binding.hrefSignUp.setOnClickListener {
-            (requireActivity() as MainActivity).openMainFragment("REGISTRATION", RegFragment())
+            (requireActivity() as AuthActivity).openFragment("REGISTRATION", RegFragment())
         }
 
         binding.errorSignInTextView.visibility = View.GONE
@@ -96,7 +98,11 @@ class AuthFragment : Fragment() {
                 binding.editLoginSignIn.setText("")
                 binding.editPasswordSignIn.setText("")
 
-                (requireActivity() as MainActivity).onLoginSuccess()
+                val imm =
+                    requireView().context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(requireView().windowToken, 0)
+
+                (requireActivity() as AuthActivity).startMain()
             } catch (_: HttpException) {
                 binding.errorSignInTextView.text = "Ошибка сервера, попробуйте позже"
                 binding.errorSignInTextView.visibility = View.VISIBLE
@@ -109,3 +115,4 @@ class AuthFragment : Fragment() {
         }
     }
 }
+

@@ -18,7 +18,7 @@
         android:theme="@style/Theme.Itemly"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.main.AuthActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -27,6 +27,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

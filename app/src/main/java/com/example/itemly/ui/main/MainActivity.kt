@@ -1,5 +1,6 @@
 package com.example.itemly.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
@@ -9,13 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import com.example.itemly.data.objects.PrefKeys
 import com.example.itemly.databinding.ActivityMainBinding
 import com.example.itemly.ui.add.AddFragment
 import com.example.itemly.ui.favorite.FavoriteFragment
 import com.example.itemly.ui.like.LikeFragment
 import com.example.itemly.ui.account.AccountFragment
-import com.example.itemly.ui.authorization.AuthFragment
 import com.example.itemly.ui.home.HomeFragment
 import com.example.itemly.ui.main.components.BottomBarView.Item
 import com.example.itemly.ui.viewModel.NavigationViewModel
@@ -37,12 +36,12 @@ class MainActivity : AppCompatActivity() {
         setupBottomBar()
 
         if (savedInstanceState == null) {
-            loadingApplication()
+            openMainFragment("HOME", HomeFragment())
         } else {
             restoreStacks()
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
 
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
@@ -64,19 +63,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
-    }
-
-    private fun loadingApplication() {
-        val prefs = getSharedPreferences(PrefKeys.PREF_USER, MODE_PRIVATE)
-        val isLogged = prefs.getBoolean(PrefKeys.IS_LOGIN, false)
-
-        if (isLogged) {
-            visibilityBottomBar(true)
-            openMainFragment("HOME", HomeFragment())
-        } else {
-            visibilityBottomBar(false)
-            openMainFragment("AUTHORIZATION", AuthFragment())
-        }
     }
 
     private fun restoreStacks() {
@@ -132,14 +118,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun visibilityBottomBar(visible: Boolean) {
-        if (visible) {
-            binding.bottomBar.visibility = View.VISIBLE
-            binding.bottomBar.select(Item.HOME)
-        } else
-            binding.bottomBar.visibility = View.GONE
-    }
-
     private fun handleBack(): Boolean {
         if (navigateViewModel.detailStack.isNotEmpty()) {
             val fragment =
@@ -175,18 +153,8 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 
-    private fun clearBackStack(clearMain: Boolean) {
+    private fun clearBackStack() {
         val transaction = supportFragmentManager.beginTransaction()
-
-        if (clearMain) {
-            navigateViewModel.mainStack.forEach { tag ->
-                supportFragmentManager.findFragmentByTag(tag)?.let {
-                    transaction.remove(it)
-                }
-            }
-            navigateViewModel.mainStack.clear()
-
-        }
 
         if (navigateViewModel.detailStack.isEmpty()) return
 
@@ -210,7 +178,7 @@ class MainActivity : AppCompatActivity() {
 
     // Управление фрагментами
     fun openMainFragment(tag: String, fragment: Fragment) {
-        clearBackStack(false)
+        clearBackStack()
 
         val transaction = supportFragmentManager.beginTransaction()
 
@@ -261,18 +229,10 @@ class MainActivity : AppCompatActivity() {
         binding.bottomBar.visibility = View.GONE
     }
 
-    fun onLoginSuccess() {
-        openMainFragment("HOME", HomeFragment())
-
-        clearBackStack(true)
-
-        visibilityBottomBar(true)
-    }
-
     fun logoutAccount() {
         logout(this)
-        openMainFragment("AUTHORIZATION", AuthFragment())
-        clearBackStack(true)
-        visibilityBottomBar(false)
+
+        startActivity(Intent(this, AuthActivity::class.java))
+        finish()
     }
 }

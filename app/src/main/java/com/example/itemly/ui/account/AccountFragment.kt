@@ -82,7 +82,7 @@ class AccountFragment : Fragment() {
             changeTheme.setOnClickListener { changeTheme() }
             logoutAccount.setOnClickListener {
                 logout(requireContext())
-                (activity as? MainActivity)?.logoutAccount()
+                (activity as MainActivity).logoutAccount()
                 restoreSettingState()
             }
         }
