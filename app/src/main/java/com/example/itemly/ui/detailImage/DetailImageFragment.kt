@@ -111,9 +111,13 @@ class DetailImageFragment : Fragment() {
                 }
             )
 
-            val adapterImage = AdapterImageView(mutableListOf()) { data ->
-                (activity as? MainActivity)?.openDetailFragment(newInstance(data))
-            }
+            val adapterImage = AdapterImageView(
+                mutableListOf(),
+                { data ->
+                    (activity as? MainActivity)?.openDetailFragment(newInstance(data))
+                },
+                {}
+            )
 
             val concatAdapter = ConcatAdapter(headerAdapter, adapterImage)
 

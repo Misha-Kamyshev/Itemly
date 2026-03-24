@@ -41,9 +41,14 @@ class FavoriteFragment : Fragment() {
     }
 
     private fun setupRecycler() {
-        val adapter = AdapterImageView(mutableListOf()) { data ->
-            (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(data))
-        }
+        val adapter = AdapterImageView(
+            mutableListOf(),
+            { data ->
+                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(data))
+            },
+            {
+                binding.titleEmptyFavorite.visibility = if (it) View.VISIBLE else View.GONE
+            })
 
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE

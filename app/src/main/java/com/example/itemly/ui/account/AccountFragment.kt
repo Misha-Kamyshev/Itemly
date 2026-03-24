@@ -79,9 +79,15 @@ class AccountFragment : Fragment() {
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
-        adapterItem = AdapterImageView(mutableListOf()) { item ->
-            (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(item))
-        }
+        adapterItem = AdapterImageView(
+            mutableListOf(),
+            { item ->
+                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(item))
+            },
+            {
+                binding.titleEmptyAccount.visibility = if (it) View.VISIBLE else View.GONE
+            }
+        )
 
         headerAdapter = HeaderAdapter(
             username = username,

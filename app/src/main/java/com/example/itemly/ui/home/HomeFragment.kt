@@ -58,13 +58,17 @@ class HomeFragment : Fragment() {
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
-        val adapter = AdapterImageView(mutableListOf()) { data ->
-            val imm =
-                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(binding.editSearch.windowToken, 0)
+        val adapter = AdapterImageView(
+            mutableListOf(),
+            { data ->
+                val imm =
+                    requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(binding.editSearch.windowToken, 0)
 
-            (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(data))
-        }
+                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(data))
+            },
+            {}
+        )
 
         binding.recyclerFragmentHome.apply {
             this.adapter = adapter

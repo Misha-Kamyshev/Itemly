@@ -72,10 +72,18 @@ class SearchTagFragment : Fragment() {
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
-        val adapter = AdapterImageView(mutableListOf()) { data ->
-            if (!binding.editSearch.hasFocus())
-                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(data))
-        }
+        val adapter = AdapterImageView(
+            mutableListOf(),
+            { data ->
+                if (!binding.editSearch.hasFocus())
+                    (activity as? MainActivity)?.openDetailFragment(
+                        DetailImageFragment.newInstance(
+                            data
+                        )
+                    )
+            },
+            {}
+        )
 
         binding.recyclerFragmentHome.apply {
             this.adapter = adapter

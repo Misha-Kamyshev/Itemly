@@ -12,7 +12,8 @@ import com.example.itemly.data.model.item.ItemData
 
 class AdapterImageView(
     private val data: MutableList<ItemData>,
-    private val onClickItem: (item: ItemData) -> Unit
+    private val onClickItem: (item: ItemData) -> Unit,
+    private val onEmptyState: (Boolean) -> Unit
 ) :
     RecyclerView.Adapter<AdapterImageView.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -42,6 +43,7 @@ class AdapterImageView(
             data.clear()
             data.addAll(list)
             notifyDataSetChanged()
+            onEmptyState(data.isEmpty())
             return
         }
 
@@ -72,5 +74,6 @@ class AdapterImageView(
                 notifyItemChanged(oldIndex)
             }
         }
+        onEmptyState(data.isEmpty())
     }
 }

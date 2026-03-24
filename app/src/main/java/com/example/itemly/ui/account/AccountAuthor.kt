@@ -71,13 +71,17 @@ class AccountAuthor : Fragment() {
             val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
-            val adapterItem = AdapterImageView(mutableListOf()) { item ->
-                (activity as? MainActivity)?.openDetailFragment(
-                    DetailImageFragment.Companion.newInstance(
-                        item
+            val adapterItem = AdapterImageView(
+                mutableListOf(),
+                { item ->
+                    (activity as? MainActivity)?.openDetailFragment(
+                        DetailImageFragment.newInstance(
+                            item
+                        )
                     )
-                )
-            }
+                },
+                {}
+            )
 
             val headerAdapter = HeaderAdapter(
                 username = usernameAuthor,

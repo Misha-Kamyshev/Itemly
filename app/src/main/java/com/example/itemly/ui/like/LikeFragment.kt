@@ -44,9 +44,14 @@ class LikeFragment : Fragment() {
         val layout = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         layout.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
 
-        adapterItem = AdapterImageView(mutableListOf()) { item ->
-            (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(item))
-        }
+        adapterItem = AdapterImageView(
+            mutableListOf(),
+            { item ->
+                (activity as? MainActivity)?.openDetailFragment(DetailImageFragment.newInstance(item))
+            },
+            {
+                binding.titleEmptyLike.visibility = if (it) View.VISIBLE else View.GONE
+            })
 
         binding.recyclerFragmentMyImage.apply {
             this.adapter = adapterItem

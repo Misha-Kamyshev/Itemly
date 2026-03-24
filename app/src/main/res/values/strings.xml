@@ -4,6 +4,9 @@
     <string name="hint_search">Поиск</string>
     <string name="push_photo">Отправка фото…</string>
     <string name="title_top_bar_favorite">Вы сохранили</string>
+    <string name="title_empty_favorite">Вы ничего не сохраняли</string>
+    <string name="title_empty_like">Вы ничего не лайкали</string>
+    <string name="title_empty_account">Вы ничего не публиковали</string>
     <string name="title_top_bar_my_image">Вы лайкнули</string>
     <string name="preview_title">Опубликовать</string>
     <string name="preview_hint">Название</string>
